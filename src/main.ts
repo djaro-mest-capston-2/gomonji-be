@@ -24,8 +24,6 @@ const getLogLevels = () => {
 };
 
 async function bootstrap() {
-  // const app = await NestFactory.create(AppModule);
-  // await app.listen(3000);
     const logLevels = getLogLevels();
     const app = await NestFactory.create(AppModule, {
       bufferLogs: true,
@@ -50,15 +48,15 @@ async function bootstrap() {
   
     const initSwagger = (app: INestApplication, serverUrl: string) => {
       const config = new DocumentBuilder()
-        .setTitle('OctoCare')
+        .setTitle('Gomonji')
         .setDescription(
-          'Electronic Medical Record (EMR) and Health Information System (HIS) for Health Providers.',
+          'Gomonji, A platform for travel agencies',
         )
         .setVersion('1.0')
         .addServer(serverUrl)
         .addBearerAuth()
         .addTag(
-          'Octocare, Electronic Medical Record, EMR, Health Information System, HIS',
+          'Gomonji, Gomonji, A platform for travel agencies',
         )
         .build();
       const document = SwaggerModule.createDocument(app, config);
@@ -114,10 +112,12 @@ async function bootstrap() {
       /^(https:\/\/([^\.]*\.)?ngrok\.io)$/i,
       /^(https:\/\/([^\.]*\.)?amplifyapp\.com)$/i,
       'https://localhost:4200',
-      'http://localhost:300',
+      'http://localhost:3000',
+      'http://localhost:5000',
     ];
     const allowedOriginsProd = [
       'https://book.octodoc.com',
+      'http://localhost:5000',
     ];
     const origins =
       environment === 'production' ? allowedOriginsProd : allowedOrigins;
