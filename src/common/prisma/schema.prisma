@@ -14,8 +14,13 @@ datasource db {
 }
 
 enum UserTypeEnum {
+  Person
+  Organization
+}
+
+enum UserRoleEnum {
   User
-  Agent
+  Agency
   Admin
 }
 
@@ -52,13 +57,8 @@ enum TripCategoryEnum {
   Honeymoon
   Adventure
   Conference
+  Group
   Unknown
-}
-
-enum RoleEnum {
-  User
-  Admin
-  Agent
 }
 
 enum PhotoTypeEnum {
@@ -67,14 +67,7 @@ enum PhotoTypeEnum {
   Unknown
 }
 
-enum ProfileTypeEnum {
-  User
-  Agent
-  Admin
-  Trip
-}
-
-enum AccountStatus {
+enum AccountStatusEnum {
   Active
   Suspended
   Closed
@@ -97,217 +90,218 @@ enum InvoiceDatePeriodEnum {
   Current
   Following
 }
+
 model Country {
-  id               String              @id @default(uuid()) @db.Uuid
-  name             String              @unique() @db.VarChar(50)
-  iso2             String              @unique() @db.Char(2)
-  iso3             String              @unique() @db.Char(3)
-  isoNumeric       String              @db.VarChar(3)
-  phoneCode        String              @db.VarChar(50)
-  continent        String?             @db.VarChar(20)
-  capital          String              @db.VarChar(50)
-  timeZone         String              @db.VarChar(50)
-  currency         String              @db.VarChar(20)
-  symbol           String?             @db.VarChar(5)
-  wholePart        String?             @db.VarChar(20)
-  fractionPart     String?             @db.VarChar(20)
-  languageCodes    String?             @db.VarChar(100)
-  perUserPrice     Float               @default(0.00) @db.DoublePrecision()
-  status           Boolean             @default(false) @db.Boolean
-  createdAt        DateTime            @default(now()) @db.Timestamptz(6)
-  createdBy        String?             @db.Uuid
-  updatedAt        DateTime            @default(now()) @updatedAt @db.Timestamptz(6)
-  updatedBy        String?             @db.Uuid
-  states           State[]
-  profile          Profile[]  
- 
+  id            String    @id @default(uuid()) @db.Uuid
+  name          String    @unique() @db.VarChar(50)
+  iso2          String    @unique() @db.Char(2)
+  iso3          String    @unique() @db.Char(3)
+  isoNumeric    String    @db.VarChar(3)
+  phoneCode     String    @db.VarChar(50)
+  continent     String?   @db.VarChar(20)
+  capital       String    @db.VarChar(50)
+  timeZone      String    @db.VarChar(50)
+  currency      String    @db.VarChar(20)
+  symbol        String?   @db.VarChar(5)
+  wholePart     String?   @db.VarChar(20)
+  fractionPart  String?   @db.VarChar(20)
+  languageCodes String?   @db.VarChar(100)
+  perUserPrice  Float     @default(0.00) @db.DoublePrecision()
+  status        Boolean   @default(false) @db.Boolean
+  createdAt     DateTime  @default(now()) @db.Timestamptz(6)
+  createdBy     String?   @db.Uuid
+  updatedAt     DateTime  @default(now()) @updatedAt @db.Timestamptz(6)
+  updatedBy     String?   @db.Uuid
+  states        State[]
+  profile       Profile[]
+
   @@map("country")
 }
 
 model State {
-  id               String              @id @default(uuid()) @db.Uuid
-  name             String              @unique() @db.VarChar(50)
-  iso2             String              @unique() @db.VarChar(10)
-  countryId        String              @db.Uuid
-  status           Boolean             @default(true) @db.Boolean
-  createdAt        DateTime            @default(now()) @db.Timestamptz(6)
-  createdBy        String?             @db.Uuid
-  updatedAt        DateTime            @updatedAt @db.Timestamptz(6)
-  updatedBy        String?             @db.Uuid
-  country          Country         @relation(fields: [countryId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  profile          Profile[]
+  id        String    @id @default(uuid()) @db.Uuid
+  name      String    @unique() @db.VarChar(50)
+  iso2      String    @unique() @db.VarChar(10)
+  countryId String    @db.Uuid
+  status    Boolean   @default(true) @db.Boolean
+  createdAt DateTime  @default(now()) @db.Timestamptz(6)
+  createdBy String?   @db.Uuid
+  updatedAt DateTime  @updatedAt @db.Timestamptz(6)
+  updatedBy String?   @db.Uuid
+  country   Country   @relation(fields: [countryId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  profile   Profile[]
 
   @@map("state")
 }
 
 model User {
   id        String       @id @default(uuid()) @db.Uuid
-  roleId   String?  @db.Uuid
-  email     String       @unique
-  gender    GenderEnum @default(Unknown)
-  password  String
-  type      UserTypeEnum? @default(User) 
-  status         Boolean     @default(false) @db.Boolean
-  createdAt      DateTime    @default(now()) @db.Timestamptz(6)
-  createdBy      String?     @db.Uuid
-  updatedAt      DateTime    @default(now()) @updatedAt @db.Timestamptz(6)
-  updatedBy      String?     @db.Uuid
-  role     Role?     @relation(fields: [roleId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  email     String       @unique @db.VarChar(50)
+  password  String       @db.VarChar(50)
+  roleId    String?      @db.Uuid
+  gender    GenderEnum   @default(Unknown)
+  type      UserTypeEnum @default(Person)
+  status    Boolean      @default(false) @db.Boolean
+  createdAt DateTime     @default(now()) @db.Timestamptz(6)
+  createdBy String?      @db.Uuid
+  updatedAt DateTime     @default(now()) @updatedAt @db.Timestamptz(6)
+  updatedBy String?      @db.Uuid
+  role      Role?        @relation(fields: [roleId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   profile   Profile?
   trips     Trip[]
   billing   Billing[]
-  address     Address[]
-  photos     Photo[]
+  address   Address[]
+  photos    Photo[]
 
   @@map("user")
 }
 
 model Profile {
-  id       String   @id @default(uuid()) @db.Uuid
-  userId   String @unique @db.Uuid
-  countryId   String?     @db.Uuid
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @unique @db.Uuid
+  countryId String?  @db.Uuid
   stateId   String?  @db.Uuid
-  name     String @db.VarChar(50)
-  ProfileType ProfileTypeEnum @default(User)
-  phoneNumber    String @db.VarChar(15)
-  status         Boolean     @default(true) @db.Boolean
-  createdAt      DateTime    @default(now()) @db.Timestamptz(6)
-  createdBy      String?     @db.Uuid
-  updatedAt      DateTime    @default(now()) @updatedAt @db.Timestamptz(6)
-  updatedBy      String?     @db.Uuid
-  user     User     @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  country     Country?     @relation(fields: [countryId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  state     State?     @relation(fields: [stateId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  phoneNo   String   @db.VarChar(15)
+  status    Boolean  @default(true) @db.Boolean
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  createdBy String?  @db.Uuid
+  updatedAt DateTime @default(now()) @updatedAt @db.Timestamptz(6)
+  updatedBy String?  @db.Uuid
+  user      User     @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  country   Country? @relation(fields: [countryId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  state     State?   @relation(fields: [stateId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
-  @@map("profile")
+  @@map("user_profile")
 }
 
 model Role {
-  id                String                     @id @default(uuid()) @db.Uuid
-  name              String                     @unique() @db.VarChar(50)
-  description       String?                    @db.VarChar(500)
-  code              String?                     @unique() @db.VarChar(20)
-  type              RoleEnum                   @default(User)
-  defaultPage       String?                    @db.VarChar(50)
-  status            Boolean                    @default(true) @db.Boolean
-  createdAt         DateTime                   @default(now()) @db.Timestamptz(6)
-  createdBy         String?                    @db.Uuid
-  updatedAt         DateTime                   @default(now()) @updatedAt @db.Timestamptz(6)
-  updatedBy         String?                    @db.Uuid
-  users             User[]
-  menuPermissions   RoleMenuPermission[]
+  id              String               @id @default(uuid()) @db.Uuid
+  name            String               @unique() @db.VarChar(50)
+  description     String?              @db.VarChar(500)
+  code            String?              @unique() @db.VarChar(20)
+  type            UserRoleEnum         @default(User)
+  defaultPage     String?              @db.VarChar(50)
+  status          Boolean              @default(true) @db.Boolean
+  createdAt       DateTime             @default(now()) @db.Timestamptz(6)
+  createdBy       String?              @db.Uuid
+  updatedAt       DateTime             @default(now()) @updatedAt @db.Timestamptz(6)
+  updatedBy       String?              @db.Uuid
+  users           User[]
+  menuPermissions RoleMenuPermission[]
 
   @@map("role")
 }
 
 model RoleMenuPermission {
-  id           String         @id @default(uuid()) @db.Uuid
-  roleId       String         @unique @db.Uuid
-  permission   Boolean        @default(false) @db.Boolean
-  status       Boolean        @default(true) @db.Boolean
-  createdAt    DateTime       @default(now()) @db.Timestamptz(6)
-  createdBy    String?        @db.Uuid
-  updatedAt    DateTime       @default(now()) @updatedAt @db.Timestamptz(6)
-  updatedBy    String?        @db.Uuid
-  role         Role       @relation(fields: [roleId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  id         String   @id @default(uuid()) @db.Uuid
+  roleId     String   @unique @db.Uuid
+  permission Boolean  @default(false) @db.Boolean
+  status     Boolean  @default(true) @db.Boolean
+  createdAt  DateTime @default(now()) @db.Timestamptz(6)
+  createdBy  String?  @db.Uuid
+  updatedAt  DateTime @default(now()) @updatedAt @db.Timestamptz(6)
+  updatedBy  String?  @db.Uuid
+  role       Role     @relation(fields: [roleId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@map("role_menu_permission")
 }
 
 model Trip {
-  id  String @id @default(uuid())
-  userId String @db.Uuid
-  agentId String? @db.Uuid  
-  title String @db.VarChar(150)
-  amount String @db.VarChar(50)
-  description String @db.VarChar(255)
-  currency CurrencyEnum @default(USD)
-  category TripCategoryEnum @default(Unknown)
-  minimumAge Int?
-  maximumAge Int?
+  id               String           @id @default(uuid())
+  userId           String           @db.Uuid
+  agencyId         String?          @db.Uuid
+  title            String           @db.VarChar(150)
+  description      String           @db.VarChar(255)
+  amount           String           @db.VarChar(50)
+  currency         CurrencyEnum     @default(USD)
+  category         TripCategoryEnum @default(Unknown)
+  minimumAge       Int?
+  maximumAge       Int?
   minimumGroupSize Int?
   maximumGroupSize Int?
-  goupSixe Int?
-  tripStarts DateTime @db.Timestamptz(6)
-  tripEnds DateTime @db.Timestamptz(6)
-  status         Boolean     @default(true) @db.Boolean
-  createdAt      DateTime    @default(now()) @db.Timestamptz(6)
-  createdBy      String?     @db.Uuid
-  updatedAt      DateTime    @default(now()) @updatedAt @db.Timestamptz(6)
-  updatedBy      String?     @db.Uuid
-  user     User     @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  address     Address[]
-  tripPhotos Photo[]
+  goupSixe         Int?
+  tripStarts       DateTime         @db.Timestamptz(6)
+  tripEnds         DateTime         @db.Timestamptz(6)
+  status           Boolean          @default(true) @db.Boolean
+  createdAt        DateTime         @default(now()) @db.Timestamptz(6)
+  createdBy        String?          @db.Uuid
+  updatedAt        DateTime         @default(now()) @updatedAt @db.Timestamptz(6)
+  updatedBy        String?          @db.Uuid
+  user             User             @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  address          Address[]
+  tripPhotos       Photo[]
 
   @@map("trip")
 }
+
 model Address {
-  id String @id @default(uuid()) @db.Uuid
-  userId String? @db.Uuid
-  tripId String? @db.Uuid
-  type AddressTypeEnum? @default(Physical)
-  street String
-  city String
-  state String
-  zip String
-  status         Boolean     @default(true) @db.Boolean
-  createdAt      DateTime    @default(now()) @db.Timestamptz(6)
-  createdBy      String?     @db.Uuid
-  updatedAt      DateTime    @default(now()) @updatedAt @db.Timestamptz(6)
-  updatedBy      String?     @db.Uuid
-  user User? @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  trip Trip? @relation(fields: [tripId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  id        String           @id @default(uuid()) @db.Uuid
+  userId    String?          @db.Uuid
+  tripId    String?          @db.Uuid
+  type      AddressTypeEnum? @default(Physical)
+  street    String
+  city      String
+  state     String
+  zip       String
+  status    Boolean          @default(true) @db.Boolean
+  createdAt DateTime         @default(now()) @db.Timestamptz(6)
+  createdBy String?          @db.Uuid
+  updatedAt DateTime         @default(now()) @updatedAt @db.Timestamptz(6)
+  updatedBy String?          @db.Uuid
+  user      User?            @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  trip      Trip?            @relation(fields: [tripId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@map("address")
 }
-model Photo {
-  id String @id @default(uuid()) @db.Uuid
-  tripId String @unique @db.Uuid
-  userId String @unique @db.Uuid
-  url String
-  photoType PhotoTypeEnum @default(Unknown)
-  status         Boolean     @default(true) @db.Boolean
-  createdAt      DateTime    @default(now()) @db.Timestamptz(6)
-  createdBy      String?     @db.Uuid
-  updatedAt      DateTime    @default(now()) @updatedAt @db.Timestamptz(6)
-  updatedBy      String?     @db.Uuid
-  trip     Trip @relation(fields: [tripId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  user     User @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
-  @@map("photo")
+model Photo {
+  id        String        @id @default(uuid()) @db.Uuid
+  tripId    String        @unique @db.Uuid
+  userId    String        @unique @db.Uuid
+  url       String
+  photoType PhotoTypeEnum @default(Unknown)
+  status    Boolean       @default(true) @db.Boolean
+  createdAt DateTime      @default(now()) @db.Timestamptz(6)
+  createdBy String?       @db.Uuid
+  updatedAt DateTime      @default(now()) @updatedAt @db.Timestamptz(6)
+  updatedBy String?       @db.Uuid
+  trip      Trip          @relation(fields: [tripId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user      User          @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("photo_file")
 }
 
 model Billing {
-  id String @id @default(uuid()) @db.Uuid
-  userId String @unique @db.Uuid
-  cardNumber String @unique @db.VarChar(16)
-  cardType String @db.VarChar(50)
-  cardName String @db.VarChar(50)
-  cardExpiry String @db.VarChar(5)
-  cardCvv String @db.VarChar(3)
-  commission String? @db.VarChar(5)
-  discount String? @db.VarChar(5)
-  status         Boolean     @default(true) @db.Boolean
-  createdAt      DateTime    @default(now()) @db.Timestamptz(6)
-  createdBy      String?     @db.Uuid
-  updatedAt      DateTime    @default(now()) @updatedAt @db.Timestamptz(6)
-  updatedBy      String?     @db.Uuid
-  user     User @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  id         String   @id @default(uuid()) @db.Uuid
+  userId     String   @unique @db.Uuid
+  cardNumber String   @unique @db.VarChar(16)
+  cardType   String   @db.VarChar(50)
+  cardName   String   @db.VarChar(50)
+  cardExpiry String   @db.VarChar(5)
+  cardCvv    String   @db.VarChar(3)
+  commission String?  @db.VarChar(5)
+  discount   String?  @db.VarChar(5)
+  status     Boolean  @default(true) @db.Boolean
+  createdAt  DateTime @default(now()) @db.Timestamptz(6)
+  createdBy  String?  @db.Uuid
+  updatedAt  DateTime @default(now()) @updatedAt @db.Timestamptz(6)
+  updatedBy  String?  @db.Uuid
+  user       User     @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@map("billing")
 }
 
 model Invoice {
-  id String @id @default(uuid()) @db.Uuid
-  userId String? @db.Uuid
-  tripId String? @db.Uuid
-  amount String @db.VarChar(50)
-  name String @db.VarChar(50)
-   status         Boolean     @default(true) @db.Boolean
-  createdAt      DateTime    @default(now()) @db.Timestamptz(6)
-  createdBy      String?     @db.Uuid
-  updatedAt      DateTime    @default(now()) @updatedAt @db.Timestamptz(6)
-  updatedBy      String?     @db.Uuid
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String?  @db.Uuid
+  tripId    String?  @db.Uuid
+  amount    String   @db.VarChar(50)
+  name      String   @db.VarChar(50)
+  status    Boolean  @default(true) @db.Boolean
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  createdBy String?  @db.Uuid
+  updatedAt DateTime @default(now()) @updatedAt @db.Timestamptz(6)
+  updatedBy String?  @db.Uuid
 
   @@map("invoice")
 }
