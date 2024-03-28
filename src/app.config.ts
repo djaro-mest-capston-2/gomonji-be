@@ -78,6 +78,7 @@ const config = {
         6 * 60 * 60, // 6 hrs
       ),
     ),
+  
     // inviteSecret: env.require('INVITE_SECRET'),
     // inviteExpires: env('INVITE_EXPIRES', 24 * 60 * 60),
   },
