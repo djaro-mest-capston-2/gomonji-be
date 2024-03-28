@@ -3,9 +3,15 @@
 
 // Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+// generator client {
+//   provider   = "prisma-client-js"
+//   engineType = "library"
+// }
 
 generator client {
   provider = "prisma-client-js"
+  engineType = "binary"
+  binaryTargets   = ["native", "debian-openssl-3.0.x"]
 }
 
 datasource db {
@@ -135,23 +141,30 @@ model State {
 }
 
 model User {
-  id        String       @id @default(uuid()) @db.Uuid
-  email     String       @unique @db.VarChar(50)
-  password  String       @db.VarChar(50)
-  roleId    String?      @db.Uuid
-  gender    GenderEnum   @default(Unknown)
-  type      UserTypeEnum @default(Person)
-  status    Boolean      @default(false) @db.Boolean
-  createdAt DateTime     @default(now()) @db.Timestamptz(6)
-  createdBy String?      @db.Uuid
-  updatedAt DateTime     @default(now()) @updatedAt @db.Timestamptz(6)
-  updatedBy String?      @db.Uuid
-  role      Role?        @relation(fields: [roleId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  profile   Profile?
-  trips     Trip[]
-  billing   Billing[]
-  address   Address[]
-  photos    Photo[]
+  id                String       @id @default(uuid()) @db.Uuid
+  email             String       @unique @db.VarChar(50)
+  password          String       @db.VarChar(50)
+  roleId            String?      @db.Uuid
+  gender            GenderEnum   @default(Unknown)
+  type              UserTypeEnum @default(Person)
+  lastLogin         DateTime?    @db.Timestamptz(6)
+  lastLoginIp       String?      @db.VarChar(50)
+  defaultPage       String?      @db.VarChar(50)
+  passwordUpdatedAt DateTime?    @default(now()) @db.Timestamptz(6)
+  passwordLockedAt  DateTime?    @db.Timestamptz(6)
+  passwordHistory   Json?        @db.JsonB
+  passwordAttempt   Int?         @db.SmallInt
+  status            Boolean      @default(false) @db.Boolean
+  createdAt         DateTime     @default(now()) @db.Timestamptz(6)
+  createdBy         String?      @db.Uuid
+  updatedAt         DateTime     @default(now()) @updatedAt @db.Timestamptz(6)
+  updatedBy         String?      @db.Uuid
+  role              Role?        @relation(fields: [roleId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  profile           Profile?
+  trips             Trip[]
+  billing           Billing[]
+  address           Address[]
+  photos            Photo[]
 
   @@map("user")
 }
@@ -210,16 +223,17 @@ model Trip {
   id               String           @id @default(uuid())
   userId           String           @db.Uuid
   agencyId         String?          @db.Uuid
+  destination      String           @db.VarChar(150)
   title            String           @db.VarChar(150)
   description      String           @db.VarChar(255)
-  amount           String           @db.VarChar(50)
+  price            String           @db.VarChar(50)
   currency         CurrencyEnum     @default(USD)
   category         TripCategoryEnum @default(Unknown)
   minimumAge       Int?
   maximumAge       Int?
   minimumGroupSize Int?
   maximumGroupSize Int?
-  goupSixe         Int?
+  noOfPeople       Int?
   tripStarts       DateTime         @db.Timestamptz(6)
   tripEnds         DateTime         @db.Timestamptz(6)
   status           Boolean          @default(true) @db.Boolean
@@ -230,26 +244,43 @@ model Trip {
   user             User             @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   address          Address[]
   tripPhotos       Photo[]
+  itenary          TripItenary[]
 
   @@map("trip")
 }
 
+model TripItenary {
+  id          String   @id @default(uuid()) @db.Uuid
+  tripId      String   @db.Uuid
+  day         Int      @default(1)
+  name        String   @db.VarChar(50)
+  description String   @db.VarChar(255)
+  status      Boolean  @default(true) @db.Boolean
+  createdAt   DateTime @default(now()) @db.Timestamptz(6)
+  createdBy   String?  @db.Uuid
+  updatedAt   DateTime @default(now()) @updatedAt @db.Timestamptz(6)
+  updatedBy   String?  @db.Uuid
+  trip        Trip     @relation(fields: [tripId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("trip_itenary")
+}
+
 model Address {
-  id        String           @id @default(uuid()) @db.Uuid
-  userId    String?          @db.Uuid
-  tripId    String?          @db.Uuid
-  type      AddressTypeEnum? @default(Physical)
-  street    String
-  city      String
-  state     String
-  zip       String
-  status    Boolean          @default(true) @db.Boolean
-  createdAt DateTime         @default(now()) @db.Timestamptz(6)
-  createdBy String?          @db.Uuid
-  updatedAt DateTime         @default(now()) @updatedAt @db.Timestamptz(6)
-  updatedBy String?          @db.Uuid
-  user      User?            @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  trip      Trip?            @relation(fields: [tripId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @db.Uuid
+  tripId    String?  @db.Uuid
+  name      String   @db.VarChar(50)
+  street    String   @db.VarChar(150)
+  city      String   @db.VarChar(50)
+  state     String   @db.VarChar(50)
+  zip       String   @db.VarChar(10)
+  status    Boolean  @default(true) @db.Boolean
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  createdBy String?  @db.Uuid
+  updatedAt DateTime @default(now()) @updatedAt @db.Timestamptz(6)
+  updatedBy String?  @db.Uuid
+  trip      Trip?    @relation(fields: [tripId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user      User     @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@map("address")
 }
