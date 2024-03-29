@@ -7,7 +7,12 @@ import {
   MinLength,
 } from 'class-validator';
 
-export class RegisterUserDto {
+export class CreateUserDto {
+  @IsNotEmpty()
+  @IsString()
+  @IsEmail()
+  email: string;
+
   @IsNotEmpty()
   @IsString()
   @MinLength(8)
@@ -15,10 +20,10 @@ export class RegisterUserDto {
   @Matches(/(?:(?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/, {
     message: 'Password is too weak!',
   })
-  newPassword: string;
+  password: string;
 
   @IsNotEmpty()
   @IsString()
   @Matches('password')
-  confirmNewPassword: string;
+  confirmPassword: string;
 }

@@ -27,5 +27,3 @@ export class RegisterUserDto {
   @Matches('password')
   confirmPassword: string;
 }
-
-

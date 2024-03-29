@@ -5,7 +5,6 @@ import dotenv from 'dotenv';
 // export const IS_PUBLIC_KEY = 'isPublic';
 // export const Public = () => SetMetadata(IS_PUBLIC_KEY, true);
 
-
 dotenv.config();
 
 const env = (key: string, defaultVal: any = undefined) => {
@@ -78,7 +77,7 @@ const config = {
         6 * 60 * 60, // 6 hrs
       ),
     ),
-  
+
     // inviteSecret: env.require('INVITE_SECRET'),
     // inviteExpires: env('INVITE_EXPIRES', 24 * 60 * 60),
   },
@@ -88,7 +87,6 @@ const config = {
   //   accessKey: env.require('MESSAGE_GATEWAY_ACCESSKEY'),
   //   smsCharPerPage: Number(env('MESSAGE_CHAR_PER_PAGE', 160)),
   // },
-
 
   // sentry: {
   //   dsn: env.require('SENTRY_DSN'),

@@ -16,14 +16,19 @@
     "start:prod": "node dist/main",
     "schema:format": "prisma format --schema=./src/common/prisma/schema.prisma",
     "prisma:generate": "prisma generate --schema ./src/common/prisma/schema.prisma",
-    "db.migration:apply": "ts-node ./src/common/prisma/migrate-tenants.ts",
-    "db.migration:create": "npx prisma migrate dev --create-only --schema=./src/common/prisma/tenant/schema.prisma",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "db.seed": "ts-node ./src/common/prisma/seed-base.ts",
+    "db.seed.runner": "ts-node ./src/common/prisma/seed-runner.ts",
+    "db.seed.runner:clients": "ts-node ./src/common/prisma/seed-runner-tenant.ts",
+    "db.migration.apply": "ts-node ./src/common/prisma/migrate-tenants.ts",
+    "db.migration.run": "npx prisma migrate deploy --schema=./src/common/prisma/schema.prisma",
+    "db.migration:create": "npx prisma migrate dev --create-only --schema=./src/common/prisma/schema.prisma",
+    "migration:run": "prisma migrate deploy"
   },
   "dependencies": {
     "@faker-js/faker": "^8.4.1",

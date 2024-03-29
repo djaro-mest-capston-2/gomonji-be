@@ -6,19 +6,20 @@ import {
   HttpStatus,
   Post,
   Request,
-  UseGuards
+  UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from './auth.guard';
-// import { AuthService } from './auth.service';
+import { AuthService } from './auth.service';
+import { AuthCredentialsDto } from './dto/auth-credential.dto';
 
 @Controller('auth')
 export class AuthController {
-  // constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService) {}
 
   @HttpCode(HttpStatus.OK)
   @Post('login')
-  signIn(@Body() signInDto: Record<string, any>) {
-    // return this.authService.signIn(signInDto.username, signInDto.password);
+  signIn(@Body() signInDto: AuthCredentialsDto) {
+    return this.authService.signIn(signInDto);
   }
 
   @UseGuards(AuthGuard)
