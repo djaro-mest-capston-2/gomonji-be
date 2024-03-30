@@ -94,6 +94,10 @@ export class UserService extends CrudService<
       where: {
         ...parsedQueryFilters,
       },
+      include: {
+        profile: true,
+        trips: true,
+      }
     };
 
     return this.findManyPaginate(args, {

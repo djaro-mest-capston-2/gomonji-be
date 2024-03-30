@@ -75,7 +75,7 @@ CREATE TABLE "state" (
 -- CreateTable
 CREATE TABLE "user" (
     "id" UUID NOT NULL,
-    "email" VARCHAR(50) NOT NULL,
+    "email" VARCHAR(100) NOT NULL,
     "password" VARCHAR(50) NOT NULL,
     "roleId" UUID,
     "gender" "GenderEnum" NOT NULL DEFAULT 'Unknown',
@@ -145,7 +145,7 @@ CREATE TABLE "role_menu_permission" (
 
 -- CreateTable
 CREATE TABLE "trip" (
-    "id" TEXT NOT NULL,
+    "id" UUID NOT NULL,
     "userId" UUID NOT NULL,
     "agencyId" UUID,
     "destination" VARCHAR(150) NOT NULL,
@@ -286,6 +286,9 @@ CREATE UNIQUE INDEX "role_code_key" ON "role"("code");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "role_menu_permission_roleId_key" ON "role_menu_permission"("roleId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "trip_itenary_tripId_key" ON "trip_itenary"("tripId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "photo_file_tripId_key" ON "photo_file"("tripId");

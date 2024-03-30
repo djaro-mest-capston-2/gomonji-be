@@ -9,9 +9,9 @@
 // }
 
 generator client {
-  provider = "prisma-client-js"
-  engineType = "binary"
-  binaryTargets   = ["native", "debian-openssl-3.0.x"]
+  provider      = "prisma-client-js"
+  engineType    = "binary"
+  binaryTargets = ["native", "debian-openssl-3.0.x"]
 }
 
 datasource db {
@@ -142,8 +142,8 @@ model State {
 
 model User {
   id                String       @id @default(uuid()) @db.Uuid
-  email             String       @unique @db.VarChar(50)
-  password          String       @db.VarChar(50)
+  email             String       @unique @db.VarChar(100)
+  password          String       @db.VarChar(100)
   roleId            String?      @db.Uuid
   gender            GenderEnum   @default(Unknown)
   type              UserTypeEnum @default(Person)
@@ -220,7 +220,7 @@ model RoleMenuPermission {
 }
 
 model Trip {
-  id               String           @id @default(uuid())
+  id               String           @id @default(uuid()) @db.Uuid
   userId           String           @db.Uuid
   agencyId         String?          @db.Uuid
   destination      String           @db.VarChar(150)
@@ -251,7 +251,7 @@ model Trip {
 
 model TripItenary {
   id          String   @id @default(uuid()) @db.Uuid
-  tripId      String   @db.Uuid
+  tripId      String   @unique @db.Uuid
   day         Int      @default(1)
   name        String   @db.VarChar(50)
   description String   @db.VarChar(255)
@@ -298,7 +298,7 @@ model Photo {
   updatedBy String?       @db.Uuid
   trip      Trip          @relation(fields: [tripId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   user      User          @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-
+  
   @@map("photo_file")
 }
 

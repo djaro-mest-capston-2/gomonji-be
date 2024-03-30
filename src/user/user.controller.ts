@@ -5,9 +5,7 @@ import {
   Query,
   Body,
   Req,
-  Patch,
   Param,
-  Delete,
   ParseUUIDPipe,
 } from '@nestjs/common';
 import { RequestWithUser } from '../auth/interfaces';
@@ -15,19 +13,13 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { UserService } from './user.service';
 import { GetUsersFilterDto } from './dto/get-user-filter-dto';
 import { CreateUserDto } from './dto/create-user-dto';
-// import { UserService } from '../lis-container-type/container-type.services';
-// import { CreateContainerTypeDto } from '../lis-container-type/dtos/create-container-type.dto';
-// import { GetContainerTypeFilterDto } from './dtos/get-container-type-filter.dto';
-// import { ApiResponseMeta } from '@@/common/decorators/response.decorator';
-// import { UpdateContainerTypeDto } from './dtos/update-container-type.dto';
-
 @ApiBearerAuth()
 @ApiTags('Users')
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Get('')
+  @Get('/')
   async getAll(
     @Query() filtersDto: GetUsersFilterDto,
     @Req() req: RequestWithUser,

@@ -7,17 +7,22 @@ import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { ConfigModule } from '@nestjs/config';
 import appConfig from './app.config';
+import { UserController } from './user/user.controller';
 
 @Global()
 @Module({
-  controllers: [AppController],
+  controllers: [AppController, UserController],
   providers: [AppService, AppUtilities],
   imports: [
+    AuthModule,
+    UserModule,
     ConfigModule.forRoot({ isGlobal: true, load: [appConfig] }),
     TripModule,
+  ],
+  exports: [
+    AppUtilities,
     AuthModule,
     UserModule,
   ],
-  exports: [AppUtilities],
 })
 export class AppModule {}
