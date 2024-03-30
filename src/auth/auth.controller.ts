@@ -5,12 +5,15 @@ import {
   HttpCode,
   HttpStatus,
   Post,
-  Request,
+  Req,
+  Res,
+  UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from './auth.guard';
 import { AuthService } from './auth.service';
 import { AuthCredentialsDto } from './dto/auth-credential.dto';
+import { RequestWithUser } from './interfaces';
 
 @Controller('auth')
 export class AuthController {
@@ -18,19 +21,25 @@ export class AuthController {
 
   @HttpCode(HttpStatus.OK)
   @Post('login')
-  signIn(@Body() signInDto: AuthCredentialsDto) {
-    return this.authService.signIn(signInDto);
+  async signIn(
+    @Body() dto: AuthCredentialsDto,
+    @Req() req: RequestWithUser,
+  ): Promise<any> {
+      return this.authService.signIn(dto, req);
   }
 
   @UseGuards(AuthGuard)
   @Get('profile')
-  getProfile(@Request() req) {
+  getProfile(
+    @Req() req
+  ): any {
     return req.user;
   }
 
   @UseGuards(AuthGuard)
-  @Get('usha')
-  getProfile1(@Request() req) {
-    return req.user;
+  @Post('logout')
+  async logout(@Res() res: Response | any): Promise<any> {
+    await this.authService.logout(res);
+    return { message: 'Logged out successfully' };
   }
 }

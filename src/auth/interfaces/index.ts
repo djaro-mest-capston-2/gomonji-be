@@ -26,46 +26,15 @@ export interface RequestWithUser extends Request {
   permittedFields?: any;
   selectFields?: any;
 }
-
-export interface RequestWithApp extends Request {
-  user: JwtAppPayload;
-  permittedFields?: any;
-  selectFields?: any;
-}
-
-export interface JwtAppPayload {
-  type: 'app';
-  appName?: string;
-  tenantName?: string;
-  appId: string;
-  tenantId: string;
-  // schemaPermissions?: RoleMenuPermission[];
-}
-
-export interface JwtClientPayload {
-  type: 'client';
-  appName?: string;
-  clientId: string;
-}
-
 export interface JwtPayload {
   type: 'user';
   userId: string;
-  employeeId: string;
   email: string;
   name: string;
-  appName?: string;
-  tenantName: string;
   role: {
     code: string;
     // schemaPermissions: RoleMenuPermission[];
   };
-  tenantId: string;
-  branches: string[];
-  contactId: string;
-  departments: string[];
-  sessionId: string;
-  activeBranchId?: string;
 }
 
 export interface DecodedPayload extends DefaultJwtPayload {
@@ -75,7 +44,5 @@ export interface DecodedPayload extends DefaultJwtPayload {
 
 export interface SessionOptions {
   sessionType?: 'user' | 'app';
-  tenantId?: string;
   userId?: string;
-  activeBranchId?: string;
 }

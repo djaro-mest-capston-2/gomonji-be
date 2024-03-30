@@ -28,16 +28,13 @@ export class UserService extends CrudService<
       const parts = term.trim().split(/\s+/);
       if (parts.length > 0) {
         return {
-          service: {
-            name: { in: parts, mode: 'insensitive' },
-          },
+          name: { in: parts, mode: 'insensitive' },
         };
       }
       return undefined;
     };
 
     const parsedQueryFilters = this.parseQueryFilter(filters, [
-      'name|equals',
       {
         key: 'term',
         where: parseSplittedTermsQuery,
