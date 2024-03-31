@@ -1,5 +1,4 @@
 import {
-  IsEmail,
   IsNotEmpty,
   IsString,
   Matches,
@@ -22,5 +21,3 @@ export class RegisterUserDto {
   @Matches('password')
   confirmNewPassword: string;
 }
-
-

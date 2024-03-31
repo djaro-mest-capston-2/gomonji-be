@@ -12,7 +12,7 @@ async function bootstrap() {
   const appPort = configService.get('app.port');
   const appHost = configService.get('app.host');
   const appHostname = configService.get('app.hostname');
-  
+
   const swaggerUser = configService.get('swagger.users');
   if (swaggerUser) {
     app.use(
@@ -33,9 +33,7 @@ async function bootstrap() {
       .setVersion('1.0')
       .addServer(serverUrl)
       .addBearerAuth()
-      .addTag(
-        'Gomonji RESTful API Documentation',
-      )
+      .addTag('Gomonji RESTful API Documentation')
       .build();
     const document = SwaggerModule.createDocument(app, config);
 

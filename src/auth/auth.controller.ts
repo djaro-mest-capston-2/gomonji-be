@@ -5,25 +5,39 @@ import {
   HttpCode,
   HttpStatus,
   Post,
-  Request,
-  UseGuards
+  Req,
+  Res,
+  UnauthorizedException,
+  UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from './auth.guard';
-// import { AuthService } from './auth.service';
+import { AuthService } from './auth.service';
+import { AuthCredentialsDto } from './dto/auth-credential.dto';
+import { RequestWithUser } from './interfaces';
 
 @Controller('auth')
 export class AuthController {
-  // constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService) {}
 
   @HttpCode(HttpStatus.OK)
   @Post('login')
-  signIn(@Body() signInDto: Record<string, any>) {
-    // return this.authService.signIn(signInDto.username, signInDto.password);
+  async signIn(
+    @Body() dto: AuthCredentialsDto,
+    @Req() req: RequestWithUser,
+  ): Promise<any> {
+    return this.authService.signIn(dto, req);
   }
 
-  @UseGuards(AuthGuard)
+  // @UseGuards(AuthGuard)
   @Get('profile')
-  getProfile(@Request() req) {
+  getProfile(@Req() req: RequestWithUser): any {
     return req.user;
+  }
+
+  // @UseGuards(AuthGuard)
+  @Post('logout')
+  async logout(@Res() res: Response | any): Promise<any> {
+    await this.authService.logout(res);
+    return { message: 'Logged out successfully' };
   }
 }

@@ -4,21 +4,21 @@ import { Prisma as Prisma, PrismaClient as PrismaClient } from '@prisma/client';
 import { CrudService } from '../common/database/crud.service';
 import moment from 'moment';
 import { AppUtilities } from '../app.utilities';
-import { TripMapType } from './trip-mapetype';
+import { ProfileMapType } from './profile-mapetype';
 import {
-  GetTripsFilterDto,
-  MapTripOrderByToValue,
-} from './dto/get-trip-filter-dto';
-import { CreateTripDto } from './dto/create-trip-dto';
+  GetProfilesFilterDto,
+  MapProfileOrderByToValue,
+} from './dto/get-profile-filter-dto';
+import { CreateProfileDto } from './dto/create-profile-dto';
 
 @Injectable()
-export class TripService extends CrudService<Prisma.TripDelegate, TripMapType> {
+export class ProfileService extends CrudService<Prisma.ProfileDelegate, ProfileMapType> {
   constructor(private prisma: PrismaClient) {
-    super(prisma.trip);
+    super(prisma.profile);
   }
 
-  async getTrips(
-    { page, size, orderBy, cursor, direction, ...filters }: GetTripsFilterDto,
+  async getAll(
+    { page, size, orderBy, cursor, direction, ...filters }: GetProfilesFilterDto,
     req: RequestWithUser,
   ) {
     const parseSplittedTermsQuery = (term: string) => {
@@ -84,15 +84,14 @@ export class TripService extends CrudService<Prisma.TripDelegate, TripMapType> {
       },
     ]);
 
-    const args: Prisma.TripFindManyArgs = {
+    const args: Prisma.ProfileFindManyArgs = {
       where: {
         ...parsedQueryFilters,
       },
       include: {
-        address: true,
-        itenary: true,
-        tripPhotos: true,
         user: true,
+        country: true,
+        state: true,
       },
     };
 
@@ -104,41 +103,44 @@ export class TripService extends CrudService<Prisma.TripDelegate, TripMapType> {
       orderBy:
         orderBy &&
         AppUtilities.unflatten({
-          [MapTripOrderByToValue[orderBy]]: direction,
+          [MapProfileOrderByToValue[orderBy]]: direction,
         }),
     });
   }
 
-  async createTrip({
+  async createProfile({
     userId,
-    title,
-    destination,
-    description,
-    price,
-    currency,
-    itinaryNames,
+    countryId,
+    stateId,
+    firstName,
+    lastName,
     ...items
-  }: CreateTripDto, Req: RequestWithUser) {
-    return this.prisma.trip.create({
+  }: CreateProfileDto, Req: RequestWithUser) {
+    return this.prisma.profile.create({
       data: {
         ...items,
-        destination,
-        title,
-        description,
-        price,
-        currency,
-        itenary: {
-          create: itinaryNames.map((name) => ({
-            name,
-          })),
-        },
-        tripEnds: new Date(),
-        tripStarts: new Date(),
+        firstName,
+        lastName,
         user: {
           connect: {
             id: userId,
           },
         },
+        country: countryId
+          ? {
+              connect: {
+                id: countryId,
+              },
+            }
+          : undefined,
+        state: stateId
+          ? {
+              connect: {
+                id: stateId,
+              },
+            }
+          : undefined,
+      
         createdAt: new Date(),
       },
     });

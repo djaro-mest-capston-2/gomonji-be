@@ -10,35 +10,34 @@ import {
 } from '@nestjs/common';
 import { RequestWithUser } from '../auth/interfaces';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { TripService } from './trip.service';
-import { GetTripsFilterDto } from './dto/get-trip-filter-dto';
-import { CreateTripDto } from './dto/create-trip-dto';
+import { UserService } from './user.service';
+import { GetUsersFilterDto } from './dto/get-user-filter-dto';
+import { CreateUserDto } from './dto/create-user-dto';
 @ApiBearerAuth()
-@ApiTags('Trips')
-@Controller('trip')
-export class TripController {
-  constructor(private readonly TripService: TripService) {}
+@ApiTags('Users')
+@Controller('user')
+export class UserController {
+  constructor(private readonly userService: UserService) {}
 
-  @Get()
+  @Get('/')
   async getAll(
-    @Query() filtersDto: GetTripsFilterDto,
+    @Query() filtersDto: GetUsersFilterDto,
     @Req() req: RequestWithUser,
   ) {
-    return this.TripService.getTrips(filtersDto, req);
+    return this.userService.getUsers(filtersDto, req);
   }
 
   @Get('/:id/info')
   async getOne(@Param('id', ParseUUIDPipe) id: string) {
-    return this.TripService.findFirstOrThrow({ where: { id } });
+    return this.userService.findFirstOrThrow({ where: { id } });
   }
 
   @Post()
-  
-  async createTrip(
-    @Req() req: RequestWithUser,
-    @Body() dto: CreateTripDto,
+  async postContainer(
+    // @Req() req: RequestWithUser,
+    @Body() dto: CreateUserDto,
   ) {
-    return this.TripService.createTrip(dto, req);
+    return this.userService.createUser(dto);
   }
 
   // @Patch('/tests/container-types/:id/update')
@@ -47,12 +46,12 @@ export class TripController {
   //   @Param('id', ParseUUIDPipe) id: string,
   //   @Body() dto: UpdateContainerTypeDto,
   // ) {
-  //   return this.TripService.updateContainerType(req, id, dto);
+  //   return this.userService.updateContainerType(req, id, dto);
   // }
 
   // @ApiResponseMeta({ message: 'Container Types archived successfully!' })
   // @Delete('/tests/container-types/:id/archive')
   // async deleteSample(@Param('id', ParseUUIDPipe) id: string) {
-  //   return this.TripService.archiveContainerType(id);
+  //   return this.userService.archiveContainerType(id);
   // }
 }

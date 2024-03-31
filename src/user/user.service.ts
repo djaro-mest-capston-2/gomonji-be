@@ -3,22 +3,23 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma as Prisma, PrismaClient as PrismaClient } from '@prisma/client';
 import { CrudService } from '../common/database/crud.service';
 import moment from 'moment';
+import bcrypt from 'bcryptjs';
 import { AppUtilities } from '../app.utilities';
-import { TripMapType } from './trip-mapetype';
+import { UserMapType } from './user-mapeType';
 import {
-  GetTripsFilterDto,
-  MapTripOrderByToValue,
-} from './dto/get-trip-filter-dto';
-import { CreateTripDto } from './dto/create-trip-dto';
+  GetUsersFilterDto,
+  MapUserOrderByToValue,
+} from './dto/get-user-filter-dto';
+import { CreateUserDto } from './dto/create-user-dto';
 
 @Injectable()
-export class TripService extends CrudService<Prisma.TripDelegate, TripMapType> {
-  constructor(private prisma: PrismaClient) {
-    super(prisma.trip);
+export class UserService extends CrudService<Prisma.UserDelegate, UserMapType> {
+  constructor(private prismaClient: PrismaClient) {
+    super(prismaClient.user);
   }
 
-  async getTrips(
-    { page, size, orderBy, cursor, direction, ...filters }: GetTripsFilterDto,
+  async getUsers(
+    { page, size, orderBy, cursor, direction, ...filters }: GetUsersFilterDto,
     req: RequestWithUser,
   ) {
     const parseSplittedTermsQuery = (term: string) => {
@@ -84,15 +85,13 @@ export class TripService extends CrudService<Prisma.TripDelegate, TripMapType> {
       },
     ]);
 
-    const args: Prisma.TripFindManyArgs = {
+    const args: Prisma.UserFindManyArgs = {
       where: {
         ...parsedQueryFilters,
       },
       include: {
-        address: true,
-        itenary: true,
-        tripPhotos: true,
-        user: true,
+        profile: true,
+        trips: true,
       },
     };
 
@@ -104,43 +103,50 @@ export class TripService extends CrudService<Prisma.TripDelegate, TripMapType> {
       orderBy:
         orderBy &&
         AppUtilities.unflatten({
-          [MapTripOrderByToValue[orderBy]]: direction,
+          [MapUserOrderByToValue[orderBy]]: direction,
         }),
     });
   }
 
-  async createTrip({
-    userId,
-    title,
-    destination,
-    description,
-    price,
-    currency,
-    itinaryNames,
-    ...items
-  }: CreateTripDto, Req: RequestWithUser) {
-    return this.prisma.trip.create({
+  async createUser({ email, password }: CreateUserDto) {
+    const salt: string = bcrypt.genSaltSync(10);
+    const hash: string = bcrypt.hashSync(password, salt);
+    return this.create({
       data: {
-        ...items,
-        destination,
-        title,
-        description,
-        price,
-        currency,
-        itenary: {
-          create: itinaryNames.map((name) => ({
-            name,
-          })),
-        },
-        tripEnds: new Date(),
-        tripStarts: new Date(),
-        user: {
-          connect: {
-            id: userId,
-          },
-        },
-        createdAt: new Date(),
+        email,
+        password: hash,
       },
     });
   }
+
+  // async updateUser(
+  //   authUser: RequestWithUser,
+  //   id: string,
+  //   dto: UpdateUserDto,
+  // ) {
+  //   const args: Prisma.UserUpdateArgs = {
+  //     where: { id },
+  //     data: {
+  //       ...dto,
+  //       updatedBy: authUser.user.userId,
+  //     },
+  //   };
+  //   return this.update(args);
+  // }
+
+  // async archiveUser(id: string) {
+  //   const sample = await this.findFirst({
+  //     where: { id },
+  //   });
+  //   if (!sample) {
+  //     throw new NotFoundException('Container Type not found!');
+  //   }
+
+  //   return this.update({
+  //     where: { id },
+  //     data: {
+  //       status: false,
+  //     },
+  //   });
+  // }
 }

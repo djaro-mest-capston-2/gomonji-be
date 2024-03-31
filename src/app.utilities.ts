@@ -137,9 +137,8 @@ export class AppUtilities {
     baseConceptId?: string,
     extras?: T,
   ) => {
-    const concept: ISnomedctConcept = await AppUtilities.fetchConceptDetails(
-      conceptId,
-    );
+    const concept: ISnomedctConcept =
+      await AppUtilities.fetchConceptDetails(conceptId);
     if (!concept) {
       return [];
     }
@@ -184,10 +183,10 @@ export class AppUtilities {
       ? error.meta.cause
         ? error.meta.cause
         : error.meta.field_name
-        ? error.meta.field_name
-        : error.meta.column
-        ? error.meta.table
-        : error.meta.table
+          ? error.meta.field_name
+          : error.meta.column
+            ? error.meta.table
+            : error.meta.table
       : error.message;
     switch (errorCode) {
       case 'P0000':
