@@ -1,16 +1,13 @@
-import { RequestWithUser } from '../auth/interfaces';
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { Prisma as Prisma, PrismaClient as PrismaClient } from '@prisma/client';
+import { Injectable } from '@nestjs/common';
+import { Prisma as Prisma, PrismaClient as PrismaClient, User } from '@prisma/client';
 import { CrudService } from '../common/database/crud.service';
 import moment from 'moment';
-import bcrypt from 'bcryptjs';
 import { AppUtilities } from '../app.utilities';
 import { UserMapType } from './user-mapeType';
 import {
   GetUsersFilterDto,
   MapUserOrderByToValue,
 } from './dto/get-user-filter-dto';
-import { CreateUserDto } from './dto/create-user-dto';
 
 @Injectable()
 export class UserService extends CrudService<Prisma.UserDelegate, UserMapType> {
@@ -20,7 +17,7 @@ export class UserService extends CrudService<Prisma.UserDelegate, UserMapType> {
 
   async getUsers(
     { page, size, orderBy, cursor, direction, ...filters }: GetUsersFilterDto,
-    req: RequestWithUser,
+    req: User,
   ) {
     const parseSplittedTermsQuery = (term: string) => {
       const parts = term.trim().split(/\s+/);
@@ -105,17 +102,6 @@ export class UserService extends CrudService<Prisma.UserDelegate, UserMapType> {
         AppUtilities.unflatten({
           [MapUserOrderByToValue[orderBy]]: direction,
         }),
-    });
-  }
-
-  async createUser({ email, password }: CreateUserDto) {
-    const salt: string = bcrypt.genSaltSync(10);
-    const hash: string = bcrypt.hashSync(password, salt);
-    return this.create({
-      data: {
-        email,
-        password: hash,
-      },
     });
   }
 }

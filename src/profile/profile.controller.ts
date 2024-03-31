@@ -8,11 +8,11 @@ import {
   Param,
   ParseUUIDPipe,
 } from '@nestjs/common';
-import { RequestWithUser } from '../auth/interfaces';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { ProfileService } from './profile.service';
 import { GetProfilesFilterDto } from './dto/get-profile-filter-dto';
 import { CreateProfileDto } from './dto/create-profile-dto';
+import { User } from '@prisma/client';
 @ApiBearerAuth()
 @ApiTags('Profiles')
 @Controller('Profile')
@@ -22,7 +22,7 @@ export class ProfileController {
   @Get()
   async getAll(
     @Query() filtersDto: GetProfilesFilterDto,
-    @Req() req: RequestWithUser,
+    @Req() req: User,
   ) {
     return this.profileService.getAll(filtersDto, req);
   }
@@ -35,7 +35,7 @@ export class ProfileController {
   @Post()
   
   async createProfile(
-    @Req() req: RequestWithUser,
+    @Req() req: User,
     @Body() dto: CreateProfileDto,
   ) {
     return this.profileService.createProfile(dto, req);

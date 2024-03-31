@@ -1,5 +1,4 @@
 import { AppUtilities } from '../../app.utilities';
-import { RequestWithUser } from '../../auth/interfaces';
 import {
   HttpException,
   Injectable,
@@ -9,6 +8,7 @@ import {
 import { CrudMapType } from '../interfaces/crud-map-type.interface';
 import { Delegate } from '../interfaces/delegate.interface';
 import { Readable } from 'stream';
+import { User } from '@prisma/client';
 
 type QuerySchema = { key: string; where: (val?: any, obj?: any) => any };
 
@@ -65,7 +65,7 @@ export abstract class CrudService<D extends Delegate, T extends CrudMapType> {
     return this.delegate.createMany(data);
   }
 
-  public async delete(data: T['delete'], authUser?: RequestWithUser) {
+  public async delete(data: T['delete'], authUser?: User) {
     try {
       return await this.delegate.delete(data);
     } catch (error) {
@@ -136,17 +136,17 @@ export abstract class CrudService<D extends Delegate, T extends CrudMapType> {
     return this.delegate.upsert(data);
   }
 
-  public async archive(id: string, authUser: RequestWithUser) {
+  public async archive(id: string, authUser: User) {
     return this.delegate.update({
       where: { id },
-      data: { status: false, updatedBy: authUser.user.userId },
+      data: { status: false, updatedBy: authUser.id },
     });
   }
 
-  public async restoreArchived(id: string, authUser: RequestWithUser) {
+  public async restoreArchived(id: string, authUser: User) {
     return this.delegate.update({
       where: { id },
-      data: { status: true, updatedBy: authUser.user.userId },
+      data: { status: true, updatedBy: authUser.id },
     });
   }
 

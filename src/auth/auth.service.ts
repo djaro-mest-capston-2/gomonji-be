@@ -1,10 +1,8 @@
-import { BadRequestException, Injectable, NotAcceptableException, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { LoginDto } from './dto/auth-credential.dto';
 import bcrypt from 'bcrypt';
-import { RequestWithUser } from './interfaces';
 import { PrismaClient, User } from '@prisma/client';
-import { Response } from 'express';
 import { AccessToken } from './types/Accesstoken';
 import { RegisterUserDto } from './dto/signup.dto';
 
@@ -35,13 +33,7 @@ export class AuthService {
     return { access_token: this.jwtService.sign(payload) };
   }
 
-  async register({email, password}: RegisterUserDto): Promise<AccessToken> {
-    const existingUser = this.prisma.user.findFirst({
-      where: { email },
-    });
-    if (existingUser) {
-      throw new BadRequestException('email already exists');
-    }
+  async register({email, password}: RegisterUserDto, req: User): Promise<AccessToken> {
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = await this.prisma.user.create({
       data: { 
@@ -50,9 +42,4 @@ export class AuthService {
     })
     return this.login({email, password}, newUser);
   }
-
-  // async logout(res: Response): Promise<void> {
-  //   res.clearCookie('access_token');
-  //   res.clearCookie('refresh_token');
-  // }
 }

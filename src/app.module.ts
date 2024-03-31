@@ -10,7 +10,6 @@ import appConfig from './app.config';
 import { UserController } from './user/user.controller';
 import { TripController } from './trip/trip.controller';
 import { ProfileController } from './profile/profile.controller';
-import { ProfileService } from './profile/profile.service';
 import { ProfileModule } from './profile/profile.module';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtGuard } from './auth/guards/jwt.guard';
