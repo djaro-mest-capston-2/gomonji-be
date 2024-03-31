@@ -1,5 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { Prisma as Prisma, PrismaClient as PrismaClient, User } from '@prisma/client';
+import {
+  Prisma as Prisma,
+  PrismaClient as PrismaClient,
+  User,
+} from '@prisma/client';
 import { CrudService } from '../common/database/crud.service';
 import moment from 'moment';
 import { AppUtilities } from '../app.utilities';

@@ -20,14 +20,11 @@ import { ProfileService } from 'src/user/profile/profile.service';
 export class UserController {
   constructor(
     private readonly userService: UserService,
-    private readonly profileService: ProfileService
-    ) {}
+    private readonly profileService: ProfileService,
+  ) {}
 
   @Get()
-  async getAll(
-    @Query() filtersDto: GetUsersFilterDto,
-    @Req() req: User,
-  ) {
+  async getAll(@Query() filtersDto: GetUsersFilterDto, @Req() req: User) {
     return this.userService.getUsers(filtersDto, req);
   }
 
@@ -44,5 +41,4 @@ export class UserController {
   ) {
     return this.profileService.createProfile(dto, id, authUser);
   }
-
 }

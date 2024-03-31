@@ -27,19 +27,23 @@ export class AuthService {
     return user;
   }
 
-  async login({email, password}: LoginDto, req: User): Promise<AccessToken> {
+  async login({ email, password }: LoginDto, req: User): Promise<AccessToken> {
     const user = await this.validateUser(email, password);
-    const payload = { email: user.email, id: user.id }; 
+    const payload = { email: user.email, id: user.id };
     return { access_token: this.jwtService.sign(payload) };
   }
 
-  async register({email, password}: RegisterUserDto, req: User): Promise<AccessToken> {
+  async register(
+    { email, password }: RegisterUserDto,
+    req: User,
+  ): Promise<AccessToken> {
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = await this.prisma.user.create({
-      data: { 
-        email, 
-        password: hashedPassword },
-    })
-    return this.login({email, password}, newUser);
+      data: {
+        email,
+        password: hashedPassword,
+      },
+    });
+    return this.login({ email, password }, newUser);
   }
 }

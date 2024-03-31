@@ -14,7 +14,7 @@ export enum TripCategoryEnum {
   Family = 'Family',
   Honeymoon = 'Honeymoon',
   Adventure = 'Adventure',
-  Conference =   'Conference',
+  Conference = 'Conference',
   Group = 'Group',
   Unknown = 'Unknown',
 }
