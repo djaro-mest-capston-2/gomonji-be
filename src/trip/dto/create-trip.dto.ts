@@ -30,13 +30,13 @@ export class CreateTripDto {
   @IsEnum(TripCategoryEnum)
   category: TripCategoryEnum;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsDate()
-  tripStarts: Date;
+  tripStarts?: Date;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsDate()
-  tripEnds: Date;
+  tripEnds?: Date;
 
   @IsOptional()
   @IsString()

@@ -7,7 +7,7 @@ import { UserMapType } from './user-mapeType';
 import {
   GetUsersFilterDto,
   MapUserOrderByToValue,
-} from './dto/get-user-filter-dto';
+} from './dto/get-user-filter.dto';
 
 @Injectable()
 export class UserService extends CrudService<Prisma.UserDelegate, UserMapType> {
