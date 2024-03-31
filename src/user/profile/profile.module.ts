@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ProfileService } from './profile.service';
 import { PrismaClient } from '@prisma/client'; 
-import { AppUtilities } from '../app.utilities';
+import { AppUtilities } from '../../app.utilities';
 
 @Module({
   providers: [ProfileService, PrismaClient, AppUtilities], 

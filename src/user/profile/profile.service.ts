@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma as Prisma, PrismaClient as PrismaClient, User } from '@prisma/client';
-import { CrudService } from '../common/database/crud.service';
+import { CrudService } from '../../common/database/crud.service';
 import { ProfileMapType } from './profile-mapetype';
 import { CreateProfileDto } from './dto/create-profile.dto';
 
@@ -11,13 +11,12 @@ export class ProfileService extends CrudService<Prisma.ProfileDelegate, ProfileM
   }
 
   async createProfile({
-    userId,
     countryId,
     stateId,
     firstName,
     lastName,
     ...items
-  }: CreateProfileDto, Req: User) {
+  }: CreateProfileDto, id: string, authUser: User) {
     return this.prisma.profile.create({
       data: {
         ...items,
@@ -25,7 +24,7 @@ export class ProfileService extends CrudService<Prisma.ProfileDelegate, ProfileM
         lastName,
         user: {
           connect: {
-            id: userId,
+            id,
           },
         },
         country: countryId

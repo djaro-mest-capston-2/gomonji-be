@@ -13,7 +13,10 @@ import { PrismaClient, User } from '@prisma/client';
 import { Public } from '../auth/decorators/public.decorator';
 import { LoginDto } from './dto/auth-credential.dto';
 import { RegisterUserDto } from './dto/signup.dto';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
+@ApiBearerAuth()
+@ApiTags('Authentication')
 @Controller('auth')
 export class AuthController {
   constructor(
