@@ -6,38 +6,45 @@ import {
   HttpStatus,
   Post,
   Req,
-  Res,
   UnauthorizedException,
-  UseGuards,
+  // Res,
+  // UnauthorizedException,
+  // UseGuards,
 } from '@nestjs/common';
-import { AuthGuard } from './auth.guard';
+// import { AuthGuard } from './auth.guard';
 import { AuthService } from './auth.service';
-import { AuthCredentialsDto } from './dto/auth-credential.dto';
+// import { AuthCredentialsDto } from './dto/auth-credential.dto';
 import { RequestWithUser } from './interfaces';
+import { PrismaClient, User } from '@prisma/client';
+import { Public } from '../auth/decorators/public.decorator';
+import { LoginDto } from './dto/auth-credential.dto';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: AuthService,
+    private prisma: PrismaClient,
+    ) {}
 
+  @Public()
   @HttpCode(HttpStatus.OK)
   @Post('login')
-  async signIn(
-    @Body() dto: AuthCredentialsDto,
-    @Req() req: RequestWithUser,
+  async login(
+    @Body() dto: LoginDto,
+    @Req() req: User,
   ): Promise<any> {
-    return this.authService.signIn(dto, req);
+    return this.authService.login(dto, req);
   }
 
   // @UseGuards(AuthGuard)
   @Get('profile')
-  getProfile(@Req() req: RequestWithUser): any {
-    return req.user;
-  }
-
-  // @UseGuards(AuthGuard)
-  @Post('logout')
-  async logout(@Res() res: Response | any): Promise<any> {
-    await this.authService.logout(res);
-    return { message: 'Logged out successfully' };
+  async getProfile(@Req() req: User): Promise<any> {
+    const profile = await this.prisma.user.findFirstOrThrow({
+      where: { id: req.id },
+    })
+    if (!profile) {
+      throw new UnauthorizedException('User not found');
+    }
+    return profile;
   }
 }
