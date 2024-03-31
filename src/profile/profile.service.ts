@@ -1,6 +1,5 @@
-import { RequestWithUser } from '../auth/interfaces';
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { Prisma as Prisma, PrismaClient as PrismaClient } from '@prisma/client';
+import { Injectable } from '@nestjs/common';
+import { Prisma as Prisma, PrismaClient as PrismaClient, User } from '@prisma/client';
 import { CrudService } from '../common/database/crud.service';
 import moment from 'moment';
 import { AppUtilities } from '../app.utilities';
@@ -19,7 +18,7 @@ export class ProfileService extends CrudService<Prisma.ProfileDelegate, ProfileM
 
   async getAll(
     { page, size, orderBy, cursor, direction, ...filters }: GetProfilesFilterDto,
-    req: RequestWithUser,
+    req: User,
   ) {
     const parseSplittedTermsQuery = (term: string) => {
       const parts = term.trim().split(/\s+/);
@@ -115,7 +114,7 @@ export class ProfileService extends CrudService<Prisma.ProfileDelegate, ProfileM
     firstName,
     lastName,
     ...items
-  }: CreateProfileDto, Req: RequestWithUser) {
+  }: CreateProfileDto, Req: User) {
     return this.prisma.profile.create({
       data: {
         ...items,

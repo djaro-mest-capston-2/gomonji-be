@@ -1,6 +1,5 @@
-import { RequestWithUser } from '../auth/interfaces';
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { Prisma as Prisma, PrismaClient as PrismaClient } from '@prisma/client';
+import { Injectable } from '@nestjs/common';
+import { Prisma as Prisma, PrismaClient as PrismaClient, User } from '@prisma/client';
 import { CrudService } from '../common/database/crud.service';
 import moment from 'moment';
 import { AppUtilities } from '../app.utilities';
@@ -19,7 +18,7 @@ export class TripService extends CrudService<Prisma.TripDelegate, TripMapType> {
 
   async getTrips(
     { page, size, orderBy, cursor, direction, ...filters }: GetTripsFilterDto,
-    req: RequestWithUser,
+    req: User,
   ) {
     const parseSplittedTermsQuery = (term: string) => {
       const parts = term.trim().split(/\s+/);
@@ -118,7 +117,7 @@ export class TripService extends CrudService<Prisma.TripDelegate, TripMapType> {
     currency,
     itinaryNames,
     ...items
-  }: CreateTripDto, Req: RequestWithUser) {
+  }: CreateTripDto, Req: User) {
     return this.prisma.trip.create({
       data: {
         ...items,
