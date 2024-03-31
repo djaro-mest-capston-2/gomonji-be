@@ -22,10 +22,7 @@ export class TripController {
 
   @Public()
   @Get()
-  async getAll(
-    @Query() filtersDto: GetTripsFilterDto,
-    @Req() req: User,
-  ) {
+  async getAll(@Query() filtersDto: GetTripsFilterDto, @Req() req: User) {
     return this.TripService.getTrips(filtersDto, req);
   }
 
@@ -36,10 +33,7 @@ export class TripController {
   }
 
   @Post()
-  async createTrip(
-    @Req() req: User,
-    @Body() dto: CreateTripDto,
-  ) {
+  async createTrip(@Req() req: User, @Body() dto: CreateTripDto) {
     return this.TripService.createTrip(dto, req);
   }
 }

@@ -1,5 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { Prisma as Prisma, PrismaClient as PrismaClient, User } from '@prisma/client';
+import {
+  Prisma as Prisma,
+  PrismaClient as PrismaClient,
+  User,
+} from '@prisma/client';
 import { CrudService } from '../common/database/crud.service';
 import moment from 'moment';
 import { AppUtilities } from '../app.utilities';
@@ -108,16 +112,19 @@ export class TripService extends CrudService<Prisma.TripDelegate, TripMapType> {
     });
   }
 
-  async createTrip({
-    userId,
-    title,
-    destination,
-    description,
-    price,
-    currency,
-    itinaryNames,
-    ...items
-  }: CreateTripDto, Req: User) {
+  async createTrip(
+    {
+      userId,
+      title,
+      destination,
+      description,
+      price,
+      currency,
+      itinaryNames,
+      ...items
+    }: CreateTripDto,
+    Req: User,
+  ) {
     return this.prisma.trip.create({
       data: {
         ...items,
