@@ -3,23 +3,22 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma as Prisma, PrismaClient as PrismaClient } from '@prisma/client';
 import { CrudService } from '../common/database/crud.service';
 import moment from 'moment';
-import bcrypt from 'bcryptjs';
 import { AppUtilities } from '../app.utilities';
-import { UserMapType } from './user-mapeType';
+import { ProfileMapType } from './profile-mapetype';
 import {
-  GetUsersFilterDto,
-  MapUserOrderByToValue,
-} from './dto/get-user-filter-dto';
-import { CreateUserDto } from './dto/create-user-dto';
+  GetProfilesFilterDto,
+  MapProfileOrderByToValue,
+} from './dto/get-profile-filter-dto';
+import { CreateProfileDto } from './dto/create-profile-dto';
 
 @Injectable()
-export class UserService extends CrudService<Prisma.UserDelegate, UserMapType> {
-  constructor(private prismaClient: PrismaClient) {
-    super(prismaClient.user);
+export class ProfileService extends CrudService<Prisma.ProfileDelegate, ProfileMapType> {
+  constructor(private prisma: PrismaClient) {
+    super(prisma.profile);
   }
 
-  async getUsers(
-    { page, size, orderBy, cursor, direction, ...filters }: GetUsersFilterDto,
+  async getAll(
+    { page, size, orderBy, cursor, direction, ...filters }: GetProfilesFilterDto,
     req: RequestWithUser,
   ) {
     const parseSplittedTermsQuery = (term: string) => {
@@ -85,13 +84,14 @@ export class UserService extends CrudService<Prisma.UserDelegate, UserMapType> {
       },
     ]);
 
-    const args: Prisma.UserFindManyArgs = {
+    const args: Prisma.ProfileFindManyArgs = {
       where: {
         ...parsedQueryFilters,
       },
       include: {
-        profile: true,
-        trips: true,
+        user: true,
+        country: true,
+        state: true,
       },
     };
 
@@ -103,50 +103,46 @@ export class UserService extends CrudService<Prisma.UserDelegate, UserMapType> {
       orderBy:
         orderBy &&
         AppUtilities.unflatten({
-          [MapUserOrderByToValue[orderBy]]: direction,
+          [MapProfileOrderByToValue[orderBy]]: direction,
         }),
     });
   }
 
-  async createUser({ email, password }: CreateUserDto) {
-    const salt: string = bcrypt.genSaltSync(10);
-    const hash: string = bcrypt.hashSync(password, salt);
-    return this.create({
+  async createProfile({
+    userId,
+    countryId,
+    stateId,
+    firstName,
+    lastName,
+    ...items
+  }: CreateProfileDto, Req: RequestWithUser) {
+    return this.prisma.profile.create({
       data: {
-        email,
-        password: hash,
+        ...items,
+        firstName,
+        lastName,
+        user: {
+          connect: {
+            id: userId,
+          },
+        },
+        country: countryId
+          ? {
+              connect: {
+                id: countryId,
+              },
+            }
+          : undefined,
+        state: stateId
+          ? {
+              connect: {
+                id: stateId,
+              },
+            }
+          : undefined,
+      
+        createdAt: new Date(),
       },
     });
   }
-
-  // async updateUser(
-  //   authUser: RequestWithUser,
-  //   id: string,
-  //   dto: UpdateUserDto,
-  // ) {
-  //   const args: Prisma.UserUpdateArgs = {
-  //     where: { id },
-  //     data: {
-  //       ...dto,
-  //       updatedBy: authUser.user.userId,
-  //     },
-  //   };
-  //   return this.update(args);
-  // }
-
-  // async archiveUser(id: string) {
-  //   const sample = await this.findFirst({
-  //     where: { id },
-  //   });
-  //   if (!sample) {
-  //     throw new NotFoundException('Container Type not found!');
-  //   }
-
-  //   return this.update({
-  //     where: { id },
-  //     data: {
-  //       status: false,
-  //     },
-  //   });
-  // }
 }

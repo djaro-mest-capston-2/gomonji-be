@@ -25,18 +25,16 @@ export class AuthController {
     @Body() dto: AuthCredentialsDto,
     @Req() req: RequestWithUser,
   ): Promise<any> {
-      return this.authService.signIn(dto, req);
+    return this.authService.signIn(dto, req);
   }
 
-  @UseGuards(AuthGuard)
+  // @UseGuards(AuthGuard)
   @Get('profile')
-  getProfile(
-    @Req() req
-  ): any {
+  getProfile(@Req() req: RequestWithUser): any {
     return req.user;
   }
 
-  @UseGuards(AuthGuard)
+  // @UseGuards(AuthGuard)
   @Post('logout')
   async logout(@Res() res: Response | any): Promise<any> {
     await this.authService.logout(res);
