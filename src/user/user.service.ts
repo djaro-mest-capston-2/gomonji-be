@@ -118,35 +118,4 @@ export class UserService extends CrudService<Prisma.UserDelegate, UserMapType> {
       },
     });
   }
-
-  // async updateUser(
-  //   authUser: RequestWithUser,
-  //   id: string,
-  //   dto: UpdateUserDto,
-  // ) {
-  //   const args: Prisma.UserUpdateArgs = {
-  //     where: { id },
-  //     data: {
-  //       ...dto,
-  //       updatedBy: authUser.user.userId,
-  //     },
-  //   };
-  //   return this.update(args);
-  // }
-
-  // async archiveUser(id: string) {
-  //   const sample = await this.findFirst({
-  //     where: { id },
-  //   });
-  //   if (!sample) {
-  //     throw new NotFoundException('Container Type not found!');
-  //   }
-
-  //   return this.update({
-  //     where: { id },
-  //     data: {
-  //       status: false,
-  //     },
-  //   });
-  // }
 }

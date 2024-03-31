@@ -1,10 +1,12 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotAcceptableException, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { AuthCredentialsDto } from './dto/auth-credential.dto';
+import { LoginDto } from './dto/auth-credential.dto';
 import bcrypt from 'bcrypt';
 import { RequestWithUser } from './interfaces';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, User } from '@prisma/client';
 import { Response } from 'express';
+import { AccessToken } from './types/Accesstoken';
+import { RegisterUserDto } from './dto/signup.dto';
 
 @Injectable()
 export class AuthService {
@@ -13,47 +15,44 @@ export class AuthService {
     private prisma: PrismaClient,
   ) {}
 
-  async signIn(
-    dto: AuthCredentialsDto,
-    req: RequestWithUser,
-  ): Promise<{ token: string; user }> {
-    const user = await this.prisma.user.findFirstOrThrow({
-      where: { email: dto.email },
+  async validateUser(email: string, password: string): Promise<User> {
+    const user: User = await this.prisma.user.findFirstOrThrow({
+      where: { email },
     });
-
-    if (!user || !(await bcrypt.compare(dto.password, user.password))) {
-      throw new UnauthorizedException('Invalid credentials');
+    if (!user) {
+      throw new BadRequestException('User not found');
     }
-
-    await this.updateUserLoginDetails(user, req);
-
-    const payload = { sub: user.id, email: user.email };
-    const token = await this.jwtService.signAsync(payload);
-
-    return { token, user };
+    const isMatch: boolean = bcrypt.compareSync(password, user.password);
+    if (!isMatch) {
+      throw new BadRequestException('Password does not match');
+    }
+    return user;
   }
 
-  private async updateUserLoginDetails(
-    user: any,
-    req: RequestWithUser,
-  ): Promise<void> {
-    const lastLoginIp = req.ip || req.connection.remoteAddress;
+  async login({email, password}: LoginDto, req: User): Promise<AccessToken> {
+    const user = await this.validateUser(email, password);
+    const payload = { email: user.email, id: user.id }; 
+    return { access_token: this.jwtService.sign(payload) };
+  }
 
-    await this.prisma.user.update({
-      where: { id: user.id },
-      data: {
-        lastLogin: new Date(),
-        lastLoginIp,
-        passwordAttempt: (user.passwordAttempt || 0) + 1,
-        ...(user.passwordAttempt === 4 && {
-          passwordLockedAt: new Date(new Date().getTime() + 600000),
-        }), // Add 10 minutes if it's the 5th attempt
-      },
+  async register({email, password}: RegisterUserDto): Promise<AccessToken> {
+    const existingUser = this.prisma.user.findFirst({
+      where: { email },
     });
+    if (existingUser) {
+      throw new BadRequestException('email already exists');
+    }
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const newUser = await this.prisma.user.create({
+      data: { 
+        email, 
+        password: hashedPassword },
+    })
+    return this.login({email, password}, newUser);
   }
 
-  async logout(res: Response): Promise<void> {
-    res.clearCookie('access_token');
-    res.clearCookie('refresh_token');
-  }
+  // async logout(res: Response): Promise<void> {
+  //   res.clearCookie('access_token');
+  //   res.clearCookie('refresh_token');
+  // }
 }
