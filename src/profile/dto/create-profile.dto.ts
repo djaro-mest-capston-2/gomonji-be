@@ -27,6 +27,10 @@ export class CreateProfileDto {
 
   @IsOptional()
   @IsString()
+  companyName?: string;
+
+  @IsOptional()
+  @IsString()
   brandName?: string;
 
   @IsOptional()

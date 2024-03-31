@@ -7,8 +7,8 @@ import { TripMapType } from './trip-mapetype';
 import {
   GetTripsFilterDto,
   MapTripOrderByToValue,
-} from './dto/get-trip-filter-dto';
-import { CreateTripDto } from './dto/create-trip-dto';
+} from './dto/get-trip-filter.dto';
+import { CreateTripDto } from './dto/create-trip.dto';
 
 @Injectable()
 export class TripService extends CrudService<Prisma.TripDelegate, TripMapType> {
@@ -126,11 +126,11 @@ export class TripService extends CrudService<Prisma.TripDelegate, TripMapType> {
         description,
         price,
         currency,
-        itenary: {
-          create: itinaryNames.map((name) => ({
-            name,
-          })),
-        },
+        // itenary: {
+        //   create: itinaryNames.map((name) => ({
+        //     name,
+        //   })),
+        // },
         tripEnds: new Date(),
         tripStarts: new Date(),
         user: {

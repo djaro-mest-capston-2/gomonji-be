@@ -10,8 +10,8 @@ import {
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { TripService } from './trip.service';
-import { GetTripsFilterDto } from './dto/get-trip-filter-dto';
-import { CreateTripDto } from './dto/create-trip-dto';
+import { GetTripsFilterDto } from './dto/get-trip-filter.dto';
+import { CreateTripDto } from './dto/create-trip.dto';
 import { Public } from 'src/auth/decorators/public.decorator';
 import { User } from '@prisma/client';
 @ApiBearerAuth()

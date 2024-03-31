@@ -5,25 +5,42 @@ import {
   IsDate,
   IsEnum,
   IsOptional,
+  IsString,
 } from 'class-validator';
 
-export enum ProfilesOrderColumns {
+export enum TripsOrderColumns {
   CreatedAt = 'createdAt',
   Name = 'name',
 }
 
-export const MapProfileOrderByToValue = {
+export const MapTripOrderByToValue = {
   createdAt: 'createdAt',
   name: 'name',
 };
-export class GetProfilesFilterDto extends PaginationSearchOptionsDto {
+export class GetTripsFilterDto extends PaginationSearchOptionsDto {
+  @IsOptional()
+  @IsString()
+  destination?: string;
+
+  @IsOptional()
+  @IsString()
+  title?: string;
+
+  @IsOptional()
+  @IsString()
+  price?: string;
+
+  @IsOptional()
+  @IsString()
+  itinaryName?: string;
+
   @IsOptional()
   @IsBooleanString()
   status?: boolean;
 
-  @IsEnum(ProfilesOrderColumns)
+  @IsEnum(TripsOrderColumns)
   @IsOptional()
-  orderBy?: ProfilesOrderColumns;
+  orderBy?: TripsOrderColumns;
 
   @IsDate()
   @IsOptional()

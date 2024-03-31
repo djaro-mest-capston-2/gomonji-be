@@ -264,8 +264,8 @@ model Trip {
   minimumGroupSize Int?
   maximumGroupSize Int?
   noOfPeople       Int?
-  tripStarts       DateTime         @db.Timestamptz(6)
-  tripEnds         DateTime         @db.Timestamptz(6)
+  tripStarts       DateTime         @default(now()) @db.Timestamptz(6)
+  tripEnds         DateTime?        @db.Timestamptz(6)
   status           Boolean          @default(true) @db.Boolean
   createdAt        DateTime         @default(now()) @db.Timestamptz(6)
   createdBy        String?          @db.Uuid
