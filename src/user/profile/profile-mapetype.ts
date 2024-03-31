@@ -1,4 +1,4 @@
-import { CrudMapType } from '../common/interfaces/crud-map-type.interface';
+import { CrudMapType } from '../../common/interfaces/crud-map-type.interface';
 import { Prisma } from '@prisma/client';
 
 export class ProfileMapType implements CrudMapType {

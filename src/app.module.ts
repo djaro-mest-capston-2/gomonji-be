@@ -9,8 +9,7 @@ import { ConfigModule } from '@nestjs/config';
 import appConfig from './app.config';
 import { UserController } from './user/user.controller';
 import { TripController } from './trip/trip.controller';
-import { ProfileController } from './profile/profile.controller';
-import { ProfileModule } from './profile/profile.module';
+import { ProfileModule } from './user/profile/profile.module';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtGuard } from './auth/guards/jwt.guard';
 
@@ -23,7 +22,7 @@ import { JwtGuard } from './auth/guards/jwt.guard';
     TripModule,
     ProfileModule,
   ],
-  controllers: [AppController, UserController, TripController, ProfileController],
+  controllers: [AppController, UserController, TripController],
   providers: [
     AppService, 
     {
