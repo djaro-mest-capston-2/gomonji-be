@@ -7,11 +7,11 @@ import {
 import { CrudService } from '../common/database/crud.service';
 import moment from 'moment';
 import { AppUtilities } from '../app.utilities';
-import { UserMapType } from './user-mapeType';
 import {
   GetUsersFilterDto,
   MapUserOrderByToValue,
 } from './dto/get-user-filter.dto';
+import { UserMapType } from './user.mapetype';
 
 @Injectable()
 export class UserService extends CrudService<Prisma.UserDelegate, UserMapType> {
