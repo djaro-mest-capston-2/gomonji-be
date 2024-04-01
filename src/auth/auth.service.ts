@@ -3,8 +3,8 @@ import { JwtService } from '@nestjs/jwt';
 import { LoginDto } from './dto/auth-credential.dto';
 import bcrypt from 'bcrypt';
 import { PrismaClient, User } from '@prisma/client';
-import { AccessToken } from './types/Accesstoken';
 import { RegisterUserDto } from './dto/signup.dto';
+import { AccessToken } from './types/AccessToken';
 
 @Injectable()
 export class AuthService {
