@@ -6,7 +6,7 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "yarn": "yarn install",
+    "yarn": "yarn cache clean && yarn install",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "rm-nm": "rm -R node_modules",
