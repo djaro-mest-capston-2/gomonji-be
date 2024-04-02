@@ -43,6 +43,25 @@ async function bootstrap() {
       },
     });
   };
+  // app.enableCors();
+  const allowedOrigins = [
+    /^(https:\/\/([^\.]*\.)?ngrok\.io)$/i,
+    /^(https:\/\/([^\.]*\.)?amplifyapp\.com)$/i,
+    'http://localhost:3000',
+    'https://djaro-trips-web.vercel.app/',
+  ];
+  const allowedOriginsProd = [
+    'https://book.octodoc.com',
+
+    'https://teleweb-doc.octodoc.com',
+  ];
+  const origins =
+    environment === 'production' ? allowedOriginsProd : allowedOrigins;
+
+  app.enableCors({
+    origin: origins,
+    credentials: true,
+  });
 
   if (environment !== 'production') {
     initSwagger(app, appHost);
