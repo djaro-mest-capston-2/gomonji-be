@@ -95,7 +95,7 @@ export class TripService extends CrudService<Prisma.TripDelegate, TripMapType> {
         address: true,
         itenary: true,
         tripPhotos: true,
-        user: { include: { profile: true } },
+        user: true,
       },
     };
 
