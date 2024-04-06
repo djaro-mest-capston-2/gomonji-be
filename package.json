@@ -6,7 +6,6 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "yarn": "yarn cache clean && yarn install",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "rm-nm": "rm -R node_modules",
@@ -27,7 +26,8 @@
     "db.seed.runner": "ts-node ./src/common/prisma/seed-runner.ts",
     "db.seed.runner:clients": "ts-node ./src/common/prisma/seed-runner-tenant.ts",
     "db.migration:create": "npx prisma migrate dev --create-only --schema=./src/common/prisma/schema.prisma",
-    "db.migration.apply": "npx prisma migrate deploy --schema=./src/common/prisma/schema.prisma"
+    "db.migration.apply": "npx prisma migrate deploy --schema=./src/common/prisma/schema.prisma",
+    "db.migration.push": "npx prisma db pull --schema=./src/common/prisma/schema.prisma"
   },
   "dependencies": {
     "@faker-js/faker": "^8.4.1",
