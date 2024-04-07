@@ -48,12 +48,10 @@ async function bootstrap() {
     /^(https:\/\/([^\.]*\.)?ngrok\.io)$/i,
     /^(https:\/\/([^\.]*\.)?amplifyapp\.com)$/i,
     'http://localhost:3000',
-    'https://djaro-trips-web.vercel.app/',
+    'https://djaro-trips-web.vercel.app',
   ];
   const allowedOriginsProd = [
-    'https://book.octodoc.com',
-
-    'https://teleweb-doc.octodoc.com',
+    'https://djaro-trips-web.vercel.app/',
   ];
   const origins =
     environment === 'production' ? allowedOriginsProd : allowedOrigins;
