@@ -9,8 +9,8 @@ export class CreateProfileDto {
   @IsOptional()
   stateId?: string;
 
-  @IsUUID()
   @IsOptional()
+  @IsString()
   phoneNo?: string;
 
   @IsNotEmpty()
