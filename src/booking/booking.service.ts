@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import {
   Prisma as Prisma,
   PrismaClient as PrismaClient,
@@ -7,21 +7,20 @@ import {
 import { CrudService } from '../common/database/crud.service';
 import moment from 'moment';
 import { AppUtilities } from '../app.utilities';
-import { TripMapType } from './trip-mapetype';
-import {
-  GetTripsFilterDto,
-  MapTripOrderByToValue,
-} from './dto/get-trip-filter.dto';
-import { CreateTripDto } from './dto/create-trip.dto';
+import { BookingMapType } from './booking-mapetype';
+import { GetBookingsFilterDto, MapBookingOrderByToValue } from './dto/get-bookings-filter.dto';
+import { BookTripDto } from './dto/book-trip.dto';
+import { UpdateBookingDto } from './dto/update-booking.dto';
+
 
 @Injectable()
-export class TripService extends CrudService<Prisma.TripDelegate, TripMapType> {
+export class BookingService extends CrudService<Prisma.BookingDelegate, BookingMapType> {
   constructor(private prisma: PrismaClient) {
-    super(prisma.trip);
+    super(prisma.booking);
   }
 
-  async getTrips(
-    { page, size, orderBy, cursor, direction, ...filters }: GetTripsFilterDto,
+  async getAll(
+    { page, size, orderBy, cursor, direction, ...filters }: GetBookingsFilterDto,
     req: User,
   ) {
     const parseSplittedTermsQuery = (term: string) => {
@@ -87,15 +86,15 @@ export class TripService extends CrudService<Prisma.TripDelegate, TripMapType> {
       },
     ]);
 
-    const args: Prisma.TripFindManyArgs = {
+    const args: Prisma.BookingFindManyArgs = {
       where: {
         ...parsedQueryFilters,
       },
       include: {
-        address: true,
-        itenary: true,
-        tripPhotos: true,
-        user: true,
+        trip: true,
+        bill: true,
+        invoice: true,
+        transaction: true,
       },
     };
 
@@ -107,45 +106,86 @@ export class TripService extends CrudService<Prisma.TripDelegate, TripMapType> {
       orderBy:
         orderBy &&
         AppUtilities.unflatten({
-          [MapTripOrderByToValue[orderBy]]: direction,
+          [MapBookingOrderByToValue[orderBy]]: direction,
         }),
     });
   }
 
-  async createTrip(
+  async bookTrip(
     {
-      userId,
-      title,
-      destination,
-      description,
-      price,
-      currency,
-      itinaryNames,
-      ...items
-    }: CreateTripDto,
+      tripId,
+      billId,
+      invoiceId,
+      transactionId,
+      fullName,
+      email,
+      phoneNo,
+    }: BookTripDto,
     Req: User,
   ) {
-    return this.prisma.trip.create({
+    return this.prisma.booking.create({
       data: {
-        ...items,
-        destination,
-        title,
-        description,
-        price,
-        currency,
-        // itenary: {
-        //   create: itinaryNames.map((name) => ({
-        //     name,
-        //   })),
-        // },
-        tripEnds: new Date(),
-        tripStarts: new Date(),
-        user: {
+        trip: {
           connect: {
-            id: userId,
+            id: tripId,
           },
         },
+        ...(billId && {
+          bill: {
+            connect: {
+              id: billId,
+            },
+          },
+        }),
+        ...(invoiceId && {
+          invoice: {
+            connect: {
+              id: invoiceId,
+            },
+          },
+        }),
+        ...(transactionId && {
+          transaction: {
+            connect: {
+              id: transactionId,
+            },
+          },
+        }),
+        fullName,
+        email,
+        ...(phoneNo && { phoneNo }),
+        
         createdAt: new Date(),
+      },
+    });
+  }
+
+  async updateBooking(
+    authUser: User,
+    id: string,
+    dto: UpdateBookingDto,
+  ) {
+    const args: Prisma.BookingUpdateArgs = {
+      where: { id },
+      data: {
+        ...dto,
+        updatedBy: authUser.id,
+      },
+    };
+    return this.update(args);
+  }
+
+  async cancelBooking(id: string) {
+    const sample = await this.findFirstOrThrow({
+      where: { id },
+    });
+    if (!sample) {
+      throw new NotFoundException('Booking not found!');
+    }
+    return this.update({
+      where: { id },
+      data: {
+        status: false,
       },
     });
   }

@@ -50,9 +50,7 @@ async function bootstrap() {
     'http://localhost:3000',
     'https://djaro-trips-web.vercel.app',
   ];
-  const allowedOriginsProd = [
-    'https://djaro-trips-web.vercel.app/',
-  ];
+  const allowedOriginsProd = ['https://djaro-trips-web.vercel.app/'];
   const origins =
     environment === 'production' ? allowedOriginsProd : allowedOrigins;
 

@@ -12,6 +12,8 @@ import { TripController } from './trip/trip.controller';
 import { ProfileModule } from './user/profile/profile.module';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtGuard } from './auth/guards/jwt.guard';
+import { BookingModule } from './booking/booking.module';
+import { BookingController } from './booking/booking.controller';
 
 @Global()
 @Module({
@@ -21,8 +23,9 @@ import { JwtGuard } from './auth/guards/jwt.guard';
     UserModule,
     TripModule,
     ProfileModule,
+    BookingModule,
   ],
-  controllers: [AppController, UserController, TripController],
+  controllers: [AppController, UserController, TripController, BookingController],
   providers: [
     AppService,
     {
@@ -31,6 +34,6 @@ import { JwtGuard } from './auth/guards/jwt.guard';
     },
     AppUtilities,
   ],
-  exports: [AppUtilities, AuthModule, UserModule, ProfileModule],
+  exports: [AppUtilities, AuthModule, UserModule, ProfileModule, BookingModule, TripModule],
 })
 export class AppModule {}

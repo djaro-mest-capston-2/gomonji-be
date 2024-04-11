@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import {
   Prisma as Prisma,
   PrismaClient as PrismaClient,
@@ -13,6 +13,7 @@ import {
   MapTripOrderByToValue,
 } from './dto/get-trip-filter.dto';
 import { CreateTripDto } from './dto/create-trip.dto';
+import { UpdateTripDto } from './dto/update-trip.dto';
 
 @Injectable()
 export class TripService extends CrudService<Prisma.TripDelegate, TripMapType> {
@@ -20,7 +21,7 @@ export class TripService extends CrudService<Prisma.TripDelegate, TripMapType> {
     super(prisma.trip);
   }
 
-  async getTrips(
+  async getAll(
     { page, size, orderBy, cursor, direction, ...filters }: GetTripsFilterDto,
     req: User,
   ) {
@@ -93,7 +94,7 @@ export class TripService extends CrudService<Prisma.TripDelegate, TripMapType> {
       },
       include: {
         address: true,
-        itenary: true,
+        itinerary: true,
         tripPhotos: true,
         user: { include: { profile: true } },
       },
@@ -121,31 +122,63 @@ export class TripService extends CrudService<Prisma.TripDelegate, TripMapType> {
       price,
       currency,
       itinaryNames,
-      ...items
+      category,
+      tripStarts,
+      tripEnds,
     }: CreateTripDto,
     Req: User,
   ) {
     return this.prisma.trip.create({
       data: {
-        ...items,
-        destination,
-        title,
-        description,
-        price,
-        currency,
-        // itenary: {
-        //   create: itinaryNames.map((name) => ({
-        //     name,
-        //   })),
-        // },
-        tripEnds: new Date(),
-        tripStarts: new Date(),
         user: {
           connect: {
             id: userId,
           },
         },
+        destination,
+        title,
+        description,
+        ...(price && { price }),
+        ...(currency && { currency }),
+        itinerary: {
+          create: itinaryNames.map((name) => ({
+            name,
+          })),
+        },
+        tripEnds: tripEnds || new Date(),
+        tripStarts: tripStarts || new Date(),
+        ...(category && { category }),
         createdAt: new Date(),
+      },
+    });
+  }
+
+  async updateTrip(
+    authUser: User,
+    id: string,
+    dto: UpdateTripDto,
+  ) {
+    const args: Prisma.TripUpdateArgs = {
+      where: { id },
+      data: {
+        ...dto,
+        updatedBy: authUser.id,
+      },
+    };
+    return this.update(args);
+  }
+
+  async cancelTrip(id: string) {
+    const sample = await this.findFirst({
+      where: { id },
+    });
+    if (!sample) {
+      throw new NotFoundException('Trip not found!');
+    }
+    return this.update({
+      where: { id },
+      data: {
+        status: false,
       },
     });
   }
