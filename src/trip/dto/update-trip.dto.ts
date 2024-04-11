@@ -1,59 +1,58 @@
 import {
   IsDate,
   IsEnum,
-  IsNotEmpty,
   IsOptional,
   IsString,
   IsUUID,
 } from 'class-validator';
 import { CurrencyEnum, TripCategoryEnum } from '../interface';
 
-export class CreateTripDto {
+export class UpdateTripDto {
   @IsUUID()
-  @IsNotEmpty()
-  userId: string;
-
-  @IsNotEmpty()
-  @IsString()
-  destination: string;
-
-  @IsNotEmpty()
-  @IsString()
-  title: string;
-
-  @IsNotEmpty()
-  @IsString()
-  price: string;
-
   @IsOptional()
+  userId?: string;
+
+  @IsString()
+  @IsOptional()
+  destination?: string;
+
+  @IsString()
+  @IsOptional()
+  title?: string;
+
+  @IsString()
+  @IsOptional()
+  price?: string;
+
   @IsEnum(CurrencyEnum)
+  @IsOptional()
   currency?: CurrencyEnum;
 
-  @IsOptional()
   @IsString()
+  @IsOptional()
   description?: string;
 
-  @IsOptional()
   @IsEnum(TripCategoryEnum)
-  category: TripCategoryEnum;
-
   @IsOptional()
+  category?: TripCategoryEnum;
+
   @IsDate()
+  @IsOptional()
   tripStarts?: Date;
 
-  @IsOptional()
   @IsDate()
+  @IsOptional()
   tripEnds?: Date;
 
+  @IsString({ each: true })
   @IsOptional()
-  @IsString()
   itinaryNames?: string[];
 
-  @IsOptional()
   @IsString()
+  @IsOptional()
   itinaryLocations?: string;
 
+  @IsString({ each: true })
   @IsOptional()
-  @IsString()
   urls?: string[];
 }

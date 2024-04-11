@@ -107,7 +107,7 @@ enum SocialMediaEnum {
 }
 
 enum BookingStatusEnum {
-  Pending
+  Requested
   Confirmed
   Cancelled
 }
@@ -201,7 +201,6 @@ model User {
   address           Address[]
   photos            Photo[]
   socialMedia       SocialMedia[]
-  Booking           Booking[]
   Transaction       Transaction[]
 
   @@map("user")
@@ -302,14 +301,14 @@ model Trip {
   user             User             @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   address          Address[]
   tripPhotos       Photo[]
-  itenary          TripItenary[]
-  Booking          Booking[]
-  Transaction      Transaction[]
+  itinerary        TripItinerary[]
+  Bookings         Booking[]
+  Transactions     Transaction[]
 
   @@map("trip")
 }
 
-model TripItenary {
+model TripItinerary {
   id          String   @id @default(uuid()) @db.Uuid
   tripId      String   @unique @db.Uuid
   day         Int      @default(1)
@@ -322,27 +321,30 @@ model TripItenary {
   updatedBy   String?  @db.Uuid
   trip        Trip     @relation(fields: [tripId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
-  @@map("trip_itenary")
+  @@map("trip_itinerary")
 }
 
 model Booking {
   id            String            @id @default(uuid()) @db.Uuid
-  userId        String            @db.Uuid
   tripId        String            @db.Uuid
-  noOfPeople    Int               @default(1)
-  totalAmount   String            @db.VarChar(50)
+  billId        String?           @db.Uuid
+  invoiceId     String?           @db.Uuid
+  transactionId String?           @db.Uuid
+  fullName      String            @db.VarChar(100)
+  email         String            @db.VarChar(100)
+  phoneNo       String            @db.VarChar(15)
+  bookingStatus BookingStatusEnum @default(Requested)
   status        Boolean           @default(true) @db.Boolean
   createdAt     DateTime          @default(now()) @db.Timestamptz(6)
   createdBy     String?           @db.Uuid
   updatedAt     DateTime          @default(now()) @updatedAt @db.Timestamptz(6)
   updatedBy     String?           @db.Uuid
-  user          User              @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   trip          Trip              @relation(fields: [tripId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  bookingStatus BookingStatusEnum @default(Pending)
-  invoice       Invoice[]
-  transaction   Transaction[]
+  bill          Billing?          @relation(fields: [billId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  invoice          Invoice?          @relation(fields: [invoiceId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  transaction          Transaction?          @relation(fields: [transactionId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
-  @@unique([userId, tripId])
+
   @@map("booking")
 }
 
@@ -364,21 +366,23 @@ model Photo {
 }
 
 model Billing {
-  id         String   @id @default(uuid()) @db.Uuid
-  userId     String   @unique @db.Uuid
-  cardNumber String   @unique @db.VarChar(16)
-  cardType   String   @db.VarChar(50)
-  cardName   String   @db.VarChar(50)
-  cardExpiry String   @db.VarChar(5)
-  cardCvv    String   @db.VarChar(3)
-  commission String?  @db.VarChar(5)
-  discount   String?  @db.VarChar(5)
-  status     Boolean  @default(true) @db.Boolean
-  createdAt  DateTime @default(now()) @db.Timestamptz(6)
-  createdBy  String?  @db.Uuid
-  updatedAt  DateTime @default(now()) @updatedAt @db.Timestamptz(6)
-  updatedBy  String?  @db.Uuid
-  user       User     @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  id            String    @id @default(uuid()) @db.Uuid
+  userId        String    @unique @db.Uuid
+  cardNumber    String    @unique @db.VarChar(16)
+  cardType      String    @db.VarChar(50)
+  cardName      String    @db.VarChar(50)
+  cardExpiry    String    @db.VarChar(5)
+  cardCvv       String    @db.VarChar(3)
+  commission    String?   @db.VarChar(5)
+  discount      String?   @db.VarChar(5)
+  paymentStatus Boolean   @default(false) @db.Boolean
+  status        Boolean   @default(true) @db.Boolean
+  createdAt     DateTime  @default(now()) @db.Timestamptz(6)
+  createdBy     String?   @db.Uuid
+  updatedAt     DateTime  @default(now()) @updatedAt @db.Timestamptz(6)
+  updatedBy     String?   @db.Uuid
+  user          User      @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  booking       Booking[]
 
   @@map("billing")
 }
@@ -396,8 +400,7 @@ model Transaction {
   user      User                  @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   trip      Trip                  @relation(fields: [tripId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   invoice   Invoice[]
-  Booking   Booking?              @relation(fields: [bookingId], references: [id])
-  bookingId String?               @db.Uuid
+  booking   Booking[]
 
   @@map("transaction")
 }
@@ -413,7 +416,7 @@ model Invoice {
   createdBy     String?      @db.Uuid
   updatedAt     DateTime     @default(now()) @updatedAt @db.Timestamptz(6)
   updatedBy     String?      @db.Uuid
-  Booking       Booking?     @relation(fields: [bookingId], references: [id])
+  Booking       Booking[]
   bookingId     String?      @db.Uuid
   Transaction   Transaction? @relation(fields: [transactionId], references: [id])
   transactionId String?      @db.Uuid

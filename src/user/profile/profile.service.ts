@@ -7,6 +7,7 @@ import {
 import { CrudService } from '../../common/database/crud.service';
 import { ProfileMapType } from './profile-mapetype';
 import { CreateProfileDto } from './dto/create-profile.dto';
+import { UpdateProfileDto } from './dto/update-profile.dto';
 
 @Injectable()
 export class ProfileService extends CrudService<
@@ -18,13 +19,23 @@ export class ProfileService extends CrudService<
   }
 
   async createProfile(
-    { countryId, stateId, firstName, lastName, ...items }: CreateProfileDto,
+    {
+      countryId,
+      stateId,
+      firstName,
+      lastName,
+      phoneNo,
+      companyName,
+      website,
+      brandName,
+      description,
+      background,
+    }: CreateProfileDto,
     id: string,
     authUser: User,
   ) {
     return this.prisma.profile.create({
       data: {
-        ...items,
         firstName,
         lastName,
         user: {
@@ -46,9 +57,30 @@ export class ProfileService extends CrudService<
               },
             }
           : undefined,
+        ...(phoneNo && { phoneNo }),
+        ...(companyName && { companyName }),
+        ...(website && { website }),
+        ...(brandName && { brandName }),
+        ...(description && { description }),
+        ...(background && { background }),
 
         createdAt: new Date(),
       },
     });
+  }
+
+  async updateProfile(
+    authUser: User,
+    id: string,
+    dto: UpdateProfileDto,
+  ) {
+    const args: Prisma.ProfileUpdateArgs = {
+      where: { userId: id},
+      data: {
+        ...dto,
+        updatedBy: authUser.id,
+      },
+    };
+    return this.update(args);
   }
 }

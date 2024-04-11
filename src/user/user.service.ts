@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import {
   Prisma as Prisma,
   PrismaClient as PrismaClient,
@@ -19,7 +19,7 @@ export class UserService extends CrudService<Prisma.UserDelegate, UserMapType> {
     super(prismaClient.user);
   }
 
-  async getUsers(
+  async getAll(
     { page, size, orderBy, cursor, direction, ...filters }: GetUsersFilterDto,
     req: User,
   ) {
@@ -93,6 +93,12 @@ export class UserService extends CrudService<Prisma.UserDelegate, UserMapType> {
       include: {
         profile: true,
         trips: true,
+        address: true,
+        billing: true,
+        role: true,
+        photos: true,
+        Transaction: true,
+        socialMedia: true,
       },
     };
 
@@ -106,6 +112,39 @@ export class UserService extends CrudService<Prisma.UserDelegate, UserMapType> {
         AppUtilities.unflatten({
           [MapUserOrderByToValue[orderBy]]: direction,
         }),
+    });
+  }
+
+  async getOne(id: string, req: User) {
+    const dto: Prisma.UserFindFirstArgs = {
+      where: { id },
+      include: {
+        profile: true,
+        trips: true,
+        address: true,
+        billing: true,
+        role: true,
+        photos: true,
+        Transaction: true,
+        socialMedia: true,
+      },
+    };
+    return await this.findFirstOrThrow(dto);
+  }
+
+  async archiveUser(id: string) {
+    const user = await this.findFirstOrThrow({
+      where: { id },
+    });
+    if (!user) {
+      throw new NotFoundException('User not found!');
+    }
+
+    return this.update({
+      where: { id },
+      data: {
+        status: false,
+      },
     });
   }
 }
