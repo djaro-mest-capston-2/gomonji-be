@@ -121,7 +121,6 @@ export class TripService extends CrudService<Prisma.TripDelegate, TripMapType> {
       description,
       price,
       currency,
-      itinaryNames,
       category,
       tripStarts,
       tripEnds,
@@ -140,11 +139,6 @@ export class TripService extends CrudService<Prisma.TripDelegate, TripMapType> {
         description,
         ...(price && { price }),
         ...(currency && { currency }),
-        itinerary: {
-          create: itinaryNames.map((name) => ({
-            name,
-          })),
-        },
         tripEnds: tripEnds || new Date(),
         tripStarts: tripStarts || new Date(),
         ...(category && { category }),
@@ -153,11 +147,7 @@ export class TripService extends CrudService<Prisma.TripDelegate, TripMapType> {
     });
   }
 
-  async updateTrip(
-    authUser: User,
-    id: string,
-    dto: UpdateTripDto,
-  ) {
+  async updateTrip(authUser: User, id: string, dto: UpdateTripDto) {
     const args: Prisma.TripUpdateArgs = {
       where: { id },
       data: {

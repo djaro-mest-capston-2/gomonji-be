@@ -8,19 +8,31 @@ import { CrudService } from '../common/database/crud.service';
 import moment from 'moment';
 import { AppUtilities } from '../app.utilities';
 import { BookingMapType } from './booking-mapetype';
-import { GetBookingsFilterDto, MapBookingOrderByToValue } from './dto/get-bookings-filter.dto';
+import {
+  GetBookingsFilterDto,
+  MapBookingOrderByToValue,
+} from './dto/get-bookings-filter.dto';
 import { BookTripDto } from './dto/book-trip.dto';
 import { UpdateBookingDto } from './dto/update-booking.dto';
 
-
 @Injectable()
-export class BookingService extends CrudService<Prisma.BookingDelegate, BookingMapType> {
+export class BookingService extends CrudService<
+  Prisma.BookingDelegate,
+  BookingMapType
+> {
   constructor(private prisma: PrismaClient) {
     super(prisma.booking);
   }
 
   async getAll(
-    { page, size, orderBy, cursor, direction, ...filters }: GetBookingsFilterDto,
+    {
+      page,
+      size,
+      orderBy,
+      cursor,
+      direction,
+      ...filters
+    }: GetBookingsFilterDto,
     req: User,
   ) {
     const parseSplittedTermsQuery = (term: string) => {
@@ -117,7 +129,8 @@ export class BookingService extends CrudService<Prisma.BookingDelegate, BookingM
       billId,
       invoiceId,
       transactionId,
-      fullName,
+      firstName,
+      lastName,
       email,
       phoneNo,
     }: BookTripDto,
@@ -151,20 +164,17 @@ export class BookingService extends CrudService<Prisma.BookingDelegate, BookingM
             },
           },
         }),
-        fullName,
+        firstName,
+        ...(lastName && { lastName }),
         email,
         ...(phoneNo && { phoneNo }),
-        
+
         createdAt: new Date(),
       },
     });
   }
 
-  async updateBooking(
-    authUser: User,
-    id: string,
-    dto: UpdateBookingDto,
-  ) {
+  async updateBooking(authUser: User, id: string, dto: UpdateBookingDto) {
     const args: Prisma.BookingUpdateArgs = {
       where: { id },
       data: {

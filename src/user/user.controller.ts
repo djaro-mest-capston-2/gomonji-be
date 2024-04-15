@@ -39,7 +39,7 @@ export class UserController {
   }
 
   @Public()
-  @Post('/:id/profile')
+  @Post('/profile/:id/create')
   async createProfile(
     @Body() dto: CreateProfileDto,
     @Param('id', ParseUUIDPipe) id: string,
@@ -49,7 +49,7 @@ export class UserController {
   }
 
   @Public()
-  @Patch('/:id/profile')
+  @Patch('/profile/:id/update')
   async updateProfile(
     @Req() authUser: User,
     @Param('id', ParseUUIDPipe) id: string,

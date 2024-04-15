@@ -37,11 +37,13 @@ export class BookingController {
     return this.bookingService.findFirstOrThrow({ where: { id } });
   }
 
+  @Public()
   @Post()
   async bookTrip(@Req() req: User, @Body() dto: BookTripDto) {
     return this.bookingService.bookTrip(dto, req);
   }
 
+  @Public()
   @Patch('/:id/update')
   async updateTrip(
     @Req() req: User,
@@ -51,6 +53,7 @@ export class BookingController {
     return this.bookingService.updateBooking(req, id, dto);
   }
 
+  @Public()
   @ApiResponseMeta({ message: 'Booking successfully cancelled!' })
   @Delete('/:id/cancel')
   async cancelTrip(@Param('id', ParseUUIDPipe) id: string) {

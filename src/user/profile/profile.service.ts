@@ -34,27 +34,19 @@ export class ProfileService extends CrudService<
     id: string,
     authUser: User,
   ) {
-    return this.prisma.profile.create({
-      data: {
+    return this.prisma.profile.upsert({
+      where: { userId: id }, // Unique identifier for the profile
+      update: {
         firstName,
         lastName,
-        user: {
-          connect: {
-            id,
-          },
-        },
         country: countryId
           ? {
-              connect: {
-                id: countryId,
-              },
+              connect: { id: countryId },
             }
           : undefined,
         state: stateId
           ? {
-              connect: {
-                id: stateId,
-              },
+              connect: { id: stateId },
             }
           : undefined,
         ...(phoneNo && { phoneNo }),
@@ -63,19 +55,38 @@ export class ProfileService extends CrudService<
         ...(brandName && { brandName }),
         ...(description && { description }),
         ...(background && { background }),
-
+        updatedAt: new Date(),
+      },
+      create: {
+        firstName,
+        lastName,
+        user: {
+          connect: { id },
+        },
+        country: countryId
+          ? {
+              connect: { id: countryId },
+            }
+          : undefined,
+        state: stateId
+          ? {
+              connect: { id: stateId },
+            }
+          : undefined,
+        ...(phoneNo && { phoneNo }),
+        ...(companyName && { companyName }),
+        ...(website && { website }),
+        ...(brandName && { brandName }),
+        ...(description && { description }),
+        ...(background && { background }),
         createdAt: new Date(),
       },
     });
   }
 
-  async updateProfile(
-    authUser: User,
-    id: string,
-    dto: UpdateProfileDto,
-  ) {
+  async updateProfile(authUser: User, id: string, dto: UpdateProfileDto) {
     const args: Prisma.ProfileUpdateArgs = {
-      where: { userId: id},
+      where: { userId: id },
       data: {
         ...dto,
         updatedBy: authUser.id,

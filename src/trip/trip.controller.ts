@@ -18,6 +18,7 @@ import { Public } from 'src/auth/decorators/public.decorator';
 import { User } from '@prisma/client';
 import { ApiResponseMeta } from 'src/common/decorators/response.decorator';
 import { UpdateTripDto } from './dto/update-trip.dto';
+
 @ApiBearerAuth()
 @ApiTags('Trips')
 @Controller('trip')

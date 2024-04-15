@@ -24,10 +24,6 @@ export class GetBookingsFilterDto extends PaginationSearchOptionsDto {
 
   @IsOptional()
   @IsString()
-  fullName?: string;
-
-  @IsOptional()
-  @IsString()
   email?: string;
 
   @IsOptional()

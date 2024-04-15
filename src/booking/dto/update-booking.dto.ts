@@ -1,9 +1,4 @@
-import {
-  IsEmail,
-  IsOptional,
-  IsString,
-  IsUUID,
-} from 'class-validator';
+import { IsEmail, IsOptional, IsString, IsUUID } from 'class-validator';
 
 export class UpdateBookingDto {
   @IsUUID()
@@ -16,7 +11,11 @@ export class UpdateBookingDto {
 
   @IsString()
   @IsOptional()
-  fullName?: string;
+  firstName?: string;
+
+  @IsString()
+  @IsOptional()
+  lastName?: string;
 
   @IsString()
   @IsEmail()

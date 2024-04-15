@@ -330,9 +330,10 @@ model Booking {
   billId        String?           @db.Uuid
   invoiceId     String?           @db.Uuid
   transactionId String?           @db.Uuid
-  fullName      String            @db.VarChar(100)
+  firstName     String            @db.VarChar(100)
+  lastName      String?           @db.VarChar(100)
   email         String            @db.VarChar(100)
-  phoneNo       String            @db.VarChar(15)
+  phoneNo       String?           @db.VarChar(15)
   bookingStatus BookingStatusEnum @default(Requested)
   status        Boolean           @default(true) @db.Boolean
   createdAt     DateTime          @default(now()) @db.Timestamptz(6)

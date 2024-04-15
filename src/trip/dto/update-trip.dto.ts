@@ -1,10 +1,4 @@
-import {
-  IsDate,
-  IsEnum,
-  IsOptional,
-  IsString,
-  IsUUID,
-} from 'class-validator';
+import { IsDate, IsEnum, IsOptional, IsString, IsUUID } from 'class-validator';
 import { CurrencyEnum, TripCategoryEnum } from '../interface';
 
 export class UpdateTripDto {
