@@ -25,7 +25,11 @@ export class BookTripDto {
 
   @IsNotEmpty()
   @IsString()
-  fullName: string;
+  firstName: string;
+
+  @IsOptional()
+  @IsString()
+  lastName: string;
 
   @IsNotEmpty()
   @IsString()

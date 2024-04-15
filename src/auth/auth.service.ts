@@ -35,7 +35,7 @@ export class AuthService {
         lastLogin: new Date(),
         lastLoginIp: req.lastLoginIp || null,
       },
-    })
+    });
 
     const payload = { email: user.email, id: user.id };
     const access_token = this.jwtService.sign(payload);
