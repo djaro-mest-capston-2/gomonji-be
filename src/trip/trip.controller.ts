@@ -44,6 +44,7 @@ export class TripController {
     return this.tripService.findFirstOrThrow({ where: { id } });
   }
 
+  @Public()
   @Post()
   async createTrip(@Req() req: User, @Body() dto: CreateTripDto) {
     return this.tripService.createTrip(dto, req);
