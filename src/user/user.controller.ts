@@ -9,6 +9,8 @@ import {
   Body,
   Delete,
   Patch,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { UserService } from './user.service';
@@ -19,6 +21,7 @@ import { ProfileService } from 'src/user/profile/profile.service';
 import { Public } from 'src/auth/decorators/public.decorator';
 import { UpdateProfileDto } from './profile/dto/update-profile.dto';
 import { ApiResponseMeta } from 'src/common/decorators/response.decorator';
+import { FileInterceptor } from '@nestjs/platform-express';
 @ApiBearerAuth()
 @ApiTags('Users')
 @Controller('user')
@@ -28,11 +31,13 @@ export class UserController {
     private readonly profileService: ProfileService,
   ) {}
 
+  @Public()
   @Get()
   async getAll(@Query() filtersDto: GetUsersFilterDto, @Req() req: User) {
     return this.userService.getAll(filtersDto, req);
   }
 
+  @Public()
   @Get('/:id/info')
   async getOne(@Param('id', ParseUUIDPipe) id: string, @Req() req: User) {
     return this.userService.getOne(id, req);
@@ -64,4 +69,11 @@ export class UserController {
   async deleteSample(@Param('id', ParseUUIDPipe) id: string) {
     return this.userService.archiveUser(id);
   }
+
+  @Public()
+  @Post('/profile/:id/upload')
+@UseInterceptors(FileInterceptor('file'))
+uploadFile(@UploadedFile() file: Express.Multer.File) {
+  console.log(file);
+}
 }

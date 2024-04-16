@@ -4,23 +4,22 @@ import {
   PrismaClient as PrismaClient,
   User,
 } from '@prisma/client';
-import { CrudService } from '../common/database/crud.service';
+import { CrudService } from '../../common/database/crud.service';
 import moment from 'moment';
-import { AppUtilities } from '../app.utilities';
-import {
-  GetUsersFilterDto,
-  MapUserOrderByToValue,
-} from './dto/get-user-filter.dto';
-import { UserMapType } from './user.mapetype';
+import { AppUtilities } from '../../app.utilities';
+import { TripImagesMapType } from './trip-images-mapetype';
+import { GetTripImagesFilterDto, MapTripImagesOrderByToValue } from './dto/get-trip-images-filter.dto';
+import { CreateTripImagesDto } from './dto/create-trip-images.dto';
+import { UpdateTripImagesDto } from './dto/update-trip-images.dto';
 
 @Injectable()
-export class UserService extends CrudService<Prisma.UserDelegate, UserMapType> {
-  constructor(private prismaClient: PrismaClient) {
-    super(prismaClient.user);
+export class TripImagesService extends CrudService<Prisma.TripImagesDelegate, TripImagesMapType> {
+  constructor(private prisma: PrismaClient) {
+    super(prisma.tripImages);
   }
 
   async getAll(
-    { page, size, orderBy, cursor, direction, ...filters }: GetUsersFilterDto,
+    { page, size, orderBy, cursor, direction, ...filters }: GetTripImagesFilterDto,
     req: User,
   ) {
     const parseSplittedTermsQuery = (term: string) => {
@@ -86,18 +85,12 @@ export class UserService extends CrudService<Prisma.UserDelegate, UserMapType> {
       },
     ]);
 
-    const args: Prisma.UserFindManyArgs = {
+    const args: Prisma.TripImagesFindManyArgs = {
       where: {
         ...parsedQueryFilters,
       },
       include: {
-        profile: true,
-        trips: true,
-        address: true,
-        billing: true,
-        role: true,
-        Transaction: true,
-        socialMedia: true,
+        trip: { include: { user: true } },
       },
     };
 
@@ -109,35 +102,45 @@ export class UserService extends CrudService<Prisma.UserDelegate, UserMapType> {
       orderBy:
         orderBy &&
         AppUtilities.unflatten({
-          [MapUserOrderByToValue[orderBy]]: direction,
+          [MapTripImagesOrderByToValue[orderBy]]: direction,
         }),
     });
   }
 
-  async getOne(id: string, req: User) {
-    const dto: Prisma.UserFindFirstArgs = {
-      where: { id },
-      include: {
-        profile: true,
-        trips: true,
-        address: true,
-        billing: true,
-        role: true,
-        Transaction: true,
-        socialMedia: true,
-      },
-    };
-    return await this.findFirstOrThrow(dto);
+  async createTripImages(
+    {
+      tripId,
+      urls,
+    }: CreateTripImagesDto,
+    Req: User,
+  ) {
+    return this.prisma.tripImages.createMany({
+      data: urls.map((url) => ({
+        tripId,
+        url,
+        createdBy: Req.id,
+      })),
+      });
   }
 
-  async archiveUser(id: string) {
-    const user = await this.findFirstOrThrow({
+  async updateTripImages(authUser: User, id: string, dto: UpdateTripImagesDto) {
+    const args: Prisma.TripImagesUpdateManyArgs = {
+      where: { id },
+      data: dto.urls.map(url => ({
+        url,
+        updatedBy: authUser.id,
+      })),
+    };
+    return this.updateMany(args);
+  }
+
+  async cancelTripImage(id: string) {
+    const image = await this.findFirst({
       where: { id },
     });
-    if (!user) {
-      throw new NotFoundException('User not found!');
+    if (!image) {
+      throw new NotFoundException('Image not found!');
     }
-
     return this.update({
       where: { id },
       data: {

@@ -43,13 +43,6 @@ export class CountryController {
     const result = await this.countryService.findFirstOrThrow(dto);
 
     const retComp: Country = <Country>result;
-    // if (req.selectFields && useSelect) {
-    //   const resultFiltered = lodash.pick(
-    //     { ...retComp },
-    //     Object.keys(req.selectFields),
-    //   );
-    //   return resultFiltered;
-    // }
     return result;
   }
 
